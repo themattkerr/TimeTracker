@@ -23,20 +23,16 @@ LoadFileDialog::~LoadFileDialog()
 
 void LoadFileDialog::on_addToExistingButton_clicked()
 {
-    //ui->logTimeCheckBox->show();
-    //ui->logTimeCheckBox->setEnabled(true);
-    //ui->trackMissingTimeRadio->show();
-    //ui->logTimeAsIgnoredRadio->show();
+    ui->logTimeCheckBox->show();
+    ui->logTimeCheckBox->setEnabled(true);
+    ui->trackMissingTimeRadio->show();
+    ui->logTimeAsIgnoredRadio->show();
     ui->continueButton->show();
 
     //setLoadFileInfo(STARTNEW);
 
 }
 
-void LoadFileDialog::on_logTimeCheckBox_clicked()
-{
-
-}
 
 void LoadFileDialog::on_trackMissingTimeRadio_clicked()
 {
@@ -70,7 +66,7 @@ void LoadFileDialog::on_logTimeCheckBox_toggled(bool checked)
     {
         ui->trackMissingTimeRadio->setEnabled(true);
         ui->logTimeAsIgnoredRadio->setEnabled(true);
-
+        LoadFileInfo(TRACK);
     }
     else
     {

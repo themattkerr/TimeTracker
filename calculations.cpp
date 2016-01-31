@@ -73,11 +73,12 @@ QString millisecondsToHoursMinsSec (int nMilliseconds)
 }
 int stringToMilliseconds (QString strTime)
 {
+    strTime.remove(" ");
     strTime.remove("h").remove("m").remove("s").remove(":");
     int nLength = strTime.length();
 
     QString strReversed = strTime;
-    QString Temp;
+
     for (int iii = 0, jjj = nLength-1; iii < nLength; iii++, jjj--)
     {
 
@@ -85,13 +86,22 @@ int stringToMilliseconds (QString strTime)
     }
 
     int nTotalMilliseconds = 0;
+    if (strReversed[1] == 'P')//this would indicate that it is PM
+        {
+            nTotalMilliseconds = 3600000;
+            strReversed.remove("A").remove("P").remove("M");
+            nLength = strReversed.length();
+        }
+    QMessageBox msbx;
+    msbx.setText(strReversed);
+    msbx.exec();
     bool ok;
     for (int n = 0; n <nLength; n++)
     {
         QString strTempMultiplier;
         switch (n){
             case 0:     strTempMultiplier.append(strReversed[0]);
-                        nTotalMilliseconds = 1000*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += 1000*strTempMultiplier.toInt(&ok,10);
                         break;
             case 1:     strTempMultiplier.append(strReversed[1]);
                         nTotalMilliseconds += (10000)*strTempMultiplier.toInt(&ok,10);
@@ -110,6 +120,12 @@ int stringToMilliseconds (QString strTime)
                         break;
             return -1;
             }
+    }
+    if (!ok)
+    {
+        QMessageBox ConversionFail;
+        ConversionFail.setText("Error! Time conversion failure. Time will not be logged");
+        ConversionFail.exec();
     }
     return nTotalMilliseconds;
 }

@@ -20,8 +20,6 @@ private slots:
 
     void on_trackMissingTimeRadio_clicked();
 
-    void on_logTimeCheckBox_clicked();
-
     void on_logTimeAsIgnoredRadio_clicked();
 
     void on_continueButton_clicked();

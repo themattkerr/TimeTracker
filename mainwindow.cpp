@@ -264,13 +264,55 @@ void MainWindow::setupLog()
                TotalTime.append(line.at(iii));
            }
            m_nTotalIgnoredTime = stringToMilliseconds(TotalTime);
-
        }
+       if (line.contains("AM") || line.contains("PM") )
+       {
+           QString strLastTime;
+           int lastTimeIndex=0;
+           int am = line.lastIndexOf("AM");
+           int pm = line.lastIndexOf("PM");
+           if (am > pm)
+               lastTimeIndex = am;
+           else
+               lastTimeIndex = pm;
+           for (int iii = (lastTimeIndex-9); iii <= lastTimeIndex +2 ; iii ++)
+           {
+               strLastTime.append(line.at(iii));
+
+           }
+              QMessageBox msbx;
+              msbx.setText(strLastTime);
+              msbx.exec();
+            m_nLastRecordedTime = stringToMilliseconds(strLastTime);
+       }
+
+
        //line.remove("Total Tracked Time:  ");
        //line.remove("Total Time Ignored:  ");
 
        ui->textEdit->append(line);
-       //x++;
+       if(m_nLoadFileInfo == TRACK || m_nLoadFileInfo == IGNORE)
+       {
+       int nCurrentTime = stringToMilliseconds(t.currentTime().toString("h:mm:ss A"));
+       int nTimeDifference = nCurrentTime - m_nLastRecordedTime;
+       if (nTimeDifference < 0)
+       {
+           QMessageBox msbx;
+           msbx.setText("Error! Time difference is less than zero.");
+           msbx.exec();
+           m_nLoadFileInfo = APPEND;
+           break;
+       }
+       else
+       {
+            ui->textEdit->append("Missing time:");
+            ui->textEdit->append(millisecondsToHoursMinsSec(nTimeDifference));
+       }
+       if (m_nLoadFileInfo == TRACK)
+           m_nTotalTime += nTimeDifference;
+       if (m_nLoadFileInfo == IGNORE)
+           m_nTotalIgnoredTime += nTimeDifference;
+       }
    }
 
    file.close();

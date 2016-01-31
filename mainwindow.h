@@ -42,6 +42,7 @@ private:
     bool m_bSaved;
     int m_nTotalTime;
     int m_nTotalIgnoredTime;
+    int m_nLastRecordedTime;
 
     int m_nLoadFileInfo;
     QString m_strFileName;
