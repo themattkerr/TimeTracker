@@ -19,7 +19,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     calculations.h \
-    loadfiledialog.h
+    loadfiledialog.h \
+    constantants.h
 
 FORMS    += mainwindow.ui \
     loadfiledialog.ui

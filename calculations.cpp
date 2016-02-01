@@ -1,9 +1,10 @@
 #include "calculations.h"
 
-
+#include <qDebug>
 #include <qstring.h>
 #include <qlocale.h>
 #include <qmessagebox.h>
+#include "constantants.h"
 
 
 
@@ -73,50 +74,52 @@ QString millisecondsToHoursMinsSec (int nMilliseconds)
 }
 int stringToMilliseconds (QString strTime)
 {
+    qDebug() << "string fed to stringToMilliseconds = " << strTime;
+
     strTime.remove(" ");
-    strTime.remove("h").remove("m").remove("s").remove(":");
+    strTime.remove("h").remove("m").remove("s").remove(":").remove('\n');
     int nLength = strTime.length();
 
     QString strReversed = strTime;
 
     for (int iii = 0, jjj = nLength-1; iii < nLength; iii++, jjj--)
     {
-
         strReversed[iii] = strTime[jjj];
     }
 
     int nTotalMilliseconds = 0;
     if (strReversed[1] == 'P')//this would indicate that it is PM
         {
-            nTotalMilliseconds = 3600000;
+            nTotalMilliseconds = MILLISECONDS_PER_12HOUR;
+        }
             strReversed.remove("A").remove("P").remove("M");
             nLength = strReversed.length();
-        }
-    QMessageBox msbx;
-    msbx.setText(strReversed);
-    msbx.exec();
+
+    //QMessageBox msbx;
+    //msbx.setText(strReversed);
+    //msbx.exec();
     bool ok;
     for (int n = 0; n <nLength; n++)
     {
-        QString strTempMultiplier;
+        QString strTempMultiplier("");
         switch (n){
             case 0:     strTempMultiplier.append(strReversed[0]);
-                        nTotalMilliseconds += 1000*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += MILLISECONDS_PER_SEC*strTempMultiplier.toInt(&ok,10);
                         break;
             case 1:     strTempMultiplier.append(strReversed[1]);
-                        nTotalMilliseconds += (10000)*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += (MILLISECONDS_PER_10SEC)*strTempMultiplier.toInt(&ok,10);
                         break;
             case 2:     strTempMultiplier.append(strReversed[2]);
-                        nTotalMilliseconds += (60000)*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += (MILLISECONDS_PER_MIN)*strTempMultiplier.toInt(&ok,10);
                         break;
             case 3:     strTempMultiplier.append(strReversed[3]);
-                        nTotalMilliseconds += (600000)*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += (MILLISECONDS_PER_10MIN)*strTempMultiplier.toInt(&ok,10);
                         break;
             case 4:     strTempMultiplier.append(strReversed[4]);
-                        nTotalMilliseconds += (3600000)*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += (MILLISECONDS_PER_HOUR)*strTempMultiplier.toInt(&ok,10);
                         break;
             case 5:     strTempMultiplier.append(strReversed[5]);
-                        nTotalMilliseconds += (36000000)*strTempMultiplier.toInt(&ok,10);
+                        nTotalMilliseconds += (MILLISECONDS_PER_10HOUR)*strTempMultiplier.toInt(&ok,10);
                         break;
             return -1;
             }
@@ -127,5 +130,7 @@ int stringToMilliseconds (QString strTime)
         ConversionFail.setText("Error! Time conversion failure. Time will not be logged");
         ConversionFail.exec();
     }
+
+    //qDebug() << "Output of stringToMilliseconds = " << nTotalMilliseconds;
     return nTotalMilliseconds;
 }
