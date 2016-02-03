@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>293</width>
-    <height>202</height>
+    <height>219</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,7 +48,7 @@
      <item>
       <widget class="QPushButton" name="addToExistingButton">
        <property name="text">
-        <string>Add to existing</string>
+        <string>Add to default log</string>
        </property>
       </widget>
      </item>
@@ -60,6 +60,13 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="browseForFileName">
+     <property name="text">
+      <string>Select a specific saved log</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="logTimeCheckBox">

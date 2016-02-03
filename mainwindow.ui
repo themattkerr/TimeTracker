@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>238</width>
-    <height>185</height>
+    <height>204</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -122,6 +122,82 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>238</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionChange_log_name"/>
+    <addaction name="actionChange_log_title"/>
+    <addaction name="actionLoad_saved_log"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions_2">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionShow_current_task_counter"/>
+    <addaction name="actionShow_Time_Ignored"/>
+   </widget>
+   <widget class="QMenu" name="menuUndo">
+    <property name="title">
+     <string>Undo</string>
+    </property>
+    <addaction name="actionUndo_last_log_entry"/>
+   </widget>
+   <addaction name="menuOptions"/>
+   <addaction name="menuOptions_2"/>
+   <addaction name="menuUndo"/>
+  </widget>
+  <action name="actionShow_current_task_counter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show current task counter</string>
+   </property>
+  </action>
+  <action name="actionUndo_last_log_entry">
+   <property name="text">
+    <string>Swap last Tracked vs Ignored</string>
+   </property>
+  </action>
+  <action name="actionChange_log_name">
+   <property name="text">
+    <string>Change log name</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionLoad_saved_log">
+   <property name="text">
+    <string>Load saved log</string>
+   </property>
+  </action>
+  <action name="actionShow_Time_Ignored">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show time ignored</string>
+   </property>
+  </action>
+  <action name="actionChange_log_title">
+   <property name="text">
+    <string>Change log title</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

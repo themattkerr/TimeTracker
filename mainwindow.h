@@ -25,13 +25,25 @@ public:
     ~MainWindow();
 
     void SetLoadFileInfo(int nLoadFileInfo );
+    void SetLogTitle(QString LogTitle);
+    void setFileName(QString strFileName);
 
 private slots:
     void on_pushButton_clicked();
+
     void displayEllapsed();
 
-
     void on_ignoreButton_clicked();
+
+    void on_actionShow_current_task_counter_triggered(bool checked);
+
+    void on_actionUndo_last_log_entry_triggered();
+
+    void on_actionShow_Time_Ignored_triggered(bool checked);
+
+    void on_actionChange_log_title_triggered();
+
+    void on_actionLoad_saved_log_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -39,6 +51,7 @@ private:
     QTime t;
     //QTextStream stmLog;
 
+    bool m_bFileNameSet;
     bool m_bSaved;
     int m_nTotalTime;
     int m_nTotalIgnoredTime;
@@ -46,10 +59,14 @@ private:
 
     int m_nLoadFileInfo;
     QString m_strFileName;
-
+    QString m_strLogTitle;
+    int m_nPreviousLogType;
+    int m_nElapsed;
 
     void setupLog();
     void saveLog(QString strFileName);
+    QString scanForTitle(QString strInput);
+
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
 };

@@ -15,12 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     calculations.cpp \
-    loadfiledialog.cpp
+    loadfiledialog.cpp \
+    changelogtitledialog.cpp
 
 HEADERS  += mainwindow.h \
     calculations.h \
     loadfiledialog.h \
-    constantants.h
+    constantants.h \
+    changelogtitledialog.h
 
 FORMS    += mainwindow.ui \
-    loadfiledialog.ui
+    loadfiledialog.ui \
+    changelogtitledialog.ui

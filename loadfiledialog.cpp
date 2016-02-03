@@ -1,6 +1,7 @@
 #include "loadfiledialog.h"
 #include "ui_loadfiledialog.h"
 #include <qdialog.h>
+#include <qfiledialog.h>
 #include "mainwindow.h"
 
 LoadFileDialog::LoadFileDialog(QWidget *parent) :
@@ -23,16 +24,20 @@ LoadFileDialog::~LoadFileDialog()
 
 void LoadFileDialog::on_addToExistingButton_clicked()
 {
-    ui->logTimeCheckBox->show();
-    ui->logTimeCheckBox->setEnabled(true);
-    ui->trackMissingTimeRadio->show();
-    ui->logTimeAsIgnoredRadio->show();
-    ui->continueButton->show();
+    showImportOptions();
 
     //setLoadFileInfo(STARTNEW);
 
 }
 
+void LoadFileDialog::showImportOptions()
+{
+    ui->logTimeCheckBox->show();
+    ui->logTimeCheckBox->setEnabled(true);
+    ui->trackMissingTimeRadio->show();
+    ui->logTimeAsIgnoredRadio->show();
+    ui->continueButton->show();
+}
 
 void LoadFileDialog::on_trackMissingTimeRadio_clicked()
 {
@@ -81,4 +86,14 @@ void LoadFileDialog::on_startNewButton_clicked()
 {
     LoadFileInfo(STARTNEW);
     this->close();
+}
+
+
+
+void LoadFileDialog::on_browseForFileName_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select a file"), "Files", tr("Time Tracker log files (*.txt)") );
+    ((MainWindow*)parentWidget())->setFileName(fileName);
+    showImportOptions();
+    ((MainWindow*)parentWidget())->SetLogTitle("Loaded Saved Log");
 }

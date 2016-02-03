@@ -3,6 +3,7 @@
 //#include "mattcalculations.h"
 #include "calculations.h"
 #include "loadfiledialog.h"
+#include "changelogtitledialog.h"
 
 #include <QDateTime>
 #include <QTime>
@@ -35,8 +36,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_nLoadFileInfo = APPEND;//This must be append in order for file name logic to work
 
     m_bSaved = false;
+    m_bFileNameSet= false;
     m_nTotalTime = 0;
     m_nTotalIgnoredTime = 0;
+    m_strLogTitle = "LogFor";
 
     QFile f(getFileName());
     if (f.exists())
@@ -52,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     Qt::WindowFlags flags = this->windowFlags();
     this->setWindowFlags(flags|Qt::WindowStaysOnTopHint);
-
+    this->setWindowTitle("Time Tracker");
     setupLog();
 
 
@@ -79,8 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->timeIgnored->show();
     }
 
-
-
     ui->CurrentTaskLabel->hide();
     ui->CurrentTaskTime->hide();
 
@@ -95,7 +96,6 @@ MainWindow::~MainWindow()
         m_strFileName = getFileName();
     saveLog(m_strFileName);
     delete ui;
-
 }
 
 
@@ -104,18 +104,18 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
 
-    int elapsed = t.elapsed();
-    m_nTotalTime = m_nTotalTime + elapsed;
+    m_nElapsed = t.elapsed();
+    m_nTotalTime = m_nTotalTime + m_nElapsed;
 
 
-    ui->textEdit->append(millisecondsToHoursMinsSec(elapsed));
+    ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
     ui->textEdit->append("----------------------------------- ");
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
     ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTime)  );
     //ui->textEdit->append("");
+    m_nPreviousLogType = TRACK;
 
     t.restart();
-
 }
 
 
@@ -126,11 +126,10 @@ void MainWindow::displayEllapsed()
 
 void MainWindow::on_ignoreButton_clicked()
 {
-    int elapsed = t.elapsed();
-    m_nTotalIgnoredTime = m_nTotalIgnoredTime + elapsed;
+    m_nElapsed = t.elapsed();
+    m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
 
-
-    ui->textEdit->append(millisecondsToHoursMinsSec(elapsed));
+    ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
     ui->textEdit->append("> Ignored <");
     ui->textEdit->append("----------------------------------- ");
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
@@ -138,10 +137,10 @@ void MainWindow::on_ignoreButton_clicked()
 
     ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime)  );
 
-    ui->timeIgnoredLabel->show();
-    ui->timeIgnored->show();
+//    ui->timeIgnoredLabel->show();
+//    ui->timeIgnored->show();
 
-
+    m_nPreviousLogType = IGNORE;
 
 
     t.restart();
@@ -160,8 +159,11 @@ void MainWindow::saveLog(QString strFileName)
     {
         QTextStream stmLog(&Log);
 
+
+
         if (m_bSaved == false)
         {
+            stmLog << "<> " << m_strLogTitle << " <>"<<'\n';
             stmLog << ui->textEdit->toPlainText();
             stmLog << '\n' << '\n';
             stmLog << "Total Tracked Time:  " << millisecondsToHoursMinsSec(m_nTotalTime) << '\n';
@@ -177,13 +179,20 @@ void MainWindow::saveLog(QString strFileName)
     }
 }
 
+void MainWindow::setFileName(QString strFileName)
+{
+    m_strFileName = strFileName;
+    m_bFileNameSet = true;
+}
+
 QString MainWindow::getFileName()
 {
-
-
+    if(m_bFileNameSet == true)
+        return m_strFileName;
     QString strFileName;
-    strFileName = "TimeTrackerFiles/LogFor";
-
+    strFileName = "TimeTrackerFiles/";
+    QString strLogTitleSimplified = m_strLogTitle;
+    strFileName.append(strLogTitleSimplified.simplified().remove(" "));
     QDateTime current = QDateTime::currentDateTime();
     QString strDateStamp = current.toString("yyyy:MM:dd");
     strDateStamp.replace(':','.');
@@ -214,7 +223,6 @@ QString MainWindow::makeNewFileName(QString strFileName)
        if(x >= 10 && x < 100)
            tempFileName.append("0");
        tempFileName.append(QString::number(x,10)).append(".txt");
-
         x++;
 
     }while (QFile::exists(tempFileName));
@@ -225,7 +233,6 @@ QString MainWindow::makeNewFileName(QString strFileName)
 
     return strFileName;
 }
-
 
 void MainWindow::SetLoadFileInfo(int nLoadFileInfo )
 {
@@ -246,6 +253,7 @@ void MainWindow::setupLog()
    while (!file.atEnd())
    {
        QString line = in.readAll();
+       line = scanForTitle(line);
 
        if (line.contains("Total Tracked Time:  "))
        {
@@ -337,4 +345,103 @@ void MainWindow::setupLog()
 
    file.close();
 
+}
+
+void MainWindow::on_actionShow_current_task_counter_triggered(bool checked)
+{
+    if (checked)
+    {
+        ui->CurrentTaskLabel->show();
+        ui->CurrentTaskTime->show();
+    }
+    else
+    {
+        ui->CurrentTaskLabel->hide();
+        ui->CurrentTaskTime->hide();
+    }
+}
+
+void MainWindow::on_actionUndo_last_log_entry_triggered()
+{
+    if(m_nPreviousLogType == TRACK)
+    {
+        m_nTotalTime = m_nTotalTime - m_nElapsed;
+        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTime));
+
+        m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
+        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
+        QString out;
+        out = "==> "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
+        ui->textEdit->append(out);
+        ui->textEdit->append("  from Tracked to Ignored");
+
+        m_nPreviousLogType = IGNORE;
+
+    }
+    else
+    {
+        m_nTotalTime = m_nTotalTime + m_nElapsed;
+        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTime));
+
+        m_nTotalIgnoredTime = m_nTotalIgnoredTime - m_nElapsed;
+        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
+
+        QString out;
+        out = "<== "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
+        ui->textEdit->append(out);
+        ui->textEdit->append("  from Ignored to Tracked");
+
+        m_nPreviousLogType = TRACK;
+    }
+
+
+}
+
+
+
+void MainWindow::on_actionShow_Time_Ignored_triggered(bool checked)
+{
+    if(checked)
+    {
+        ui->timeIgnored->show();
+        ui->timeIgnoredLabel->show();
+    }
+    else
+    {
+        ui->timeIgnored->hide();
+        ui->timeIgnoredLabel->hide();
+    }
+}
+
+void MainWindow::on_actionChange_log_title_triggered()
+{
+    ChangeLogTitleDialog *ChangeTitle = new ChangeLogTitleDialog(this);
+    ChangeTitle->exec();
+}
+
+void MainWindow::SetLogTitle(QString LogTitle)
+{
+    m_strLogTitle = LogTitle;
+    this->setWindowTitle(m_strLogTitle);
+}
+
+void MainWindow::on_actionLoad_saved_log_triggered()
+{
+    LoadFileDialog *LoadFile = new LoadFileDialog(this);
+    LoadFile->exec();
+}
+
+QString MainWindow::scanForTitle(QString strInput)
+{
+    int nTitleIndexStart =  (strInput.indexOf("<>") + 2);
+    int nTitleIndexEnd =    (strInput.indexOf("<>", nTitleIndexStart));
+    if (nTitleIndexStart < 0 || nTitleIndexEnd > 100)
+        return "Loaded saved log";
+    QString strWindowTitle;
+    for (int III = nTitleIndexStart; III < nTitleIndexEnd; III++)
+        strWindowTitle.append(strInput[III]);
+    SetLogTitle(strWindowTitle);
+    strWindowTitle.prepend("<>").append("<>").append('\n');
+    (strInput.remove(strWindowTitle));
+    return strInput;
 }

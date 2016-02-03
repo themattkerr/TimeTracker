@@ -28,10 +28,17 @@ private slots:
 
     void on_startNewButton_clicked();
 
+
+
+    void on_browseForFileName_clicked();
+
+    void showImportOptions();
+
 private:
     Ui::LoadFileDialog *ui;
 
     bool LoadFileInfo(int nLoadFileInfo);
+    QString m_strFileName;
 };
 
 #endif // LOADFILEDIALOG_H
