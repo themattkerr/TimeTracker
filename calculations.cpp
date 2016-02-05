@@ -72,6 +72,7 @@ QString millisecondsToHoursMinsSec (int nMilliseconds)
 
     return strE;
 }
+
 int stringToMilliseconds (QString strTime)
 {
     qDebug() << "string fed to stringToMilliseconds = " << strTime;
@@ -95,9 +96,6 @@ int stringToMilliseconds (QString strTime)
             strReversed.remove("A").remove("P").remove("M");
             nLength = strReversed.length();
 
-    //QMessageBox msbx;
-    //msbx.setText(strReversed);
-    //msbx.exec();
     bool ok;
     for (int n = 0; n <nLength; n++)
     {

@@ -97,3 +97,10 @@ void LoadFileDialog::on_browseForFileName_clicked()
     showImportOptions();
     ((MainWindow*)parentWidget())->SetLogTitle("Loaded Saved Log");
 }
+
+void LoadFileDialog::on_LoadFileDialog_rejected()
+{
+
+    this->close();
+    ((MainWindow*)parentWidget())->exitWithoutSave();
+}

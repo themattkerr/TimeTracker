@@ -10,6 +10,7 @@ enum LoadFileInfo{
     APPEND = 1,
     TRACK = 2,
     IGNORE = 3,
+    EXIT_NO_SAVE = 4
 };
 
 namespace Ui {
@@ -27,6 +28,7 @@ public:
     void SetLoadFileInfo(int nLoadFileInfo );
     void SetLogTitle(QString LogTitle);
     void setFileName(QString strFileName);
+    void exitWithoutSave();
 
 private slots:
     void on_pushButton_clicked();
@@ -45,6 +47,10 @@ private slots:
 
     void on_actionLoad_saved_log_triggered();
 
+    void on_actionShow_total_time_triggered(bool checked);
+
+    void on_actionUndo_last_time_logging_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -53,8 +59,9 @@ private:
 
     bool m_bFileNameSet;
     bool m_bSaved;
-    int m_nTotalTime;
+    int m_nTotalTrackedTime;
     int m_nTotalIgnoredTime;
+    int m_nTotalTime;
     int m_nLastRecordedTime;
 
     int m_nLoadFileInfo;
@@ -63,12 +70,21 @@ private:
     int m_nPreviousLogType;
     int m_nElapsed;
 
+    void initializeMemberVariables();
+    void initializeGUI();
+    void calculateTotalTime();
     void setupLog();
     void saveLog(QString strFileName);
-    QString scanForTitle(QString strInput);
+    void readInTrackedTime(QString &strInFile);
+    void readInIgnoredTime(QString &strInFile);
+    void readInLastSavedTime(QString &strInFile);
+    void logMissingTime();
 
+    QString scanForTitle(QString strInput);
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
+
+
 };
 
 #endif // MAINWINDOW_H

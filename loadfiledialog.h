@@ -34,6 +34,8 @@ private slots:
 
     void showImportOptions();
 
+    void on_LoadFileDialog_rejected();
+
 private:
     Ui::LoadFileDialog *ui;
 
