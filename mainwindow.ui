@@ -162,6 +162,7 @@
     <addaction name="actionChange_log_name"/>
     <addaction name="actionChange_log_title"/>
     <addaction name="actionLoad_saved_log"/>
+    <addaction name="actionFilter_Utility"/>
    </widget>
    <widget class="QMenu" name="menuOptions_2">
     <property name="title">
@@ -170,6 +171,7 @@
     <addaction name="actionShow_current_task_counter"/>
     <addaction name="actionShow_Time_Ignored"/>
     <addaction name="actionShow_total_time"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuUndo">
     <property name="title">
@@ -235,6 +237,11 @@
   <action name="actionUndo_last_time_logging">
    <property name="text">
     <string>Undo last time logging</string>
+   </property>
+  </action>
+  <action name="actionFilter_Utility">
+   <property name="text">
+    <string>Filter Utility</string>
    </property>
   </action>
  </widget>

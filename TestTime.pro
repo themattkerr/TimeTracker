@@ -16,14 +16,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     calculations.cpp \
     loadfiledialog.cpp \
-    changelogtitledialog.cpp
+    changelogtitledialog.cpp \
+    filterutilitydialog.cpp
 
 HEADERS  += mainwindow.h \
     calculations.h \
     loadfiledialog.h \
     constantants.h \
-    changelogtitledialog.h
+    changelogtitledialog.h \
+    filterutilitydialog.h
 
 FORMS    += mainwindow.ui \
     loadfiledialog.ui \
-    changelogtitledialog.ui
+    changelogtitledialog.ui \
+    filterutilitydialog.ui

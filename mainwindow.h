@@ -3,7 +3,9 @@
 #include <QTime>
 #include <QMainWindow>
 #include <QTextStream>
-//#include "mattcalculations.h"
+
+#define SECTION_BREAK "----------------------------------- "
+#define PROGRAM_EXIT_BREAK "===================== "
 
 enum LoadFileInfo{
     STARTNEW = 0,
@@ -29,6 +31,11 @@ public:
     void SetLogTitle(QString LogTitle);
     void setFileName(QString strFileName);
     void exitWithoutSave();
+    void filterText();
+    QString getIgnoredText();
+    QString getTrackedText();
+    int getTrackedTime();
+    int getIgnoredTime();
 
 private slots:
     void on_pushButton_clicked();
@@ -51,6 +58,8 @@ private slots:
 
     void on_actionUndo_last_time_logging_triggered();
 
+    void on_actionFilter_Utility_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -67,6 +76,8 @@ private:
     int m_nLoadFileInfo;
     QString m_strFileName;
     QString m_strLogTitle;
+    QString m_strFilteredIgnored;
+    QString m_strFilteredTracked;
     int m_nPreviousLogType;
     int m_nElapsed;
 

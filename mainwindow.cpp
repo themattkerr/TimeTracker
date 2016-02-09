@@ -4,6 +4,7 @@
 #include "calculations.h"
 #include "loadfiledialog.h"
 #include "changelogtitledialog.h"
+#include "filterutilitydialog.h"
 
 #include <QDateTime>
 #include <QTime>
@@ -98,7 +99,7 @@ void MainWindow::on_pushButton_clicked()
     m_nTotalTrackedTime = m_nTotalTrackedTime + m_nElapsed;
 
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
-    ui->textEdit->append("----------------------------------- ");
+    ui->textEdit->append(SECTION_BREAK);
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
     ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime)  );
     calculateTotalTime();
@@ -119,7 +120,7 @@ void MainWindow::on_ignoreButton_clicked()
 
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
     ui->textEdit->append("> Ignored <");
-    ui->textEdit->append("----------------------------------- ");
+    ui->textEdit->append(SECTION_BREAK);
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
 
     ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime)  );
@@ -471,4 +472,64 @@ void MainWindow::exitWithoutSave()
 void MainWindow::on_actionUndo_last_time_logging_triggered()
 {
 
+}
+QString MainWindow::getIgnoredText()
+{
+    filterText();
+    return m_strFilteredIgnored;
+}
+
+QString MainWindow::getTrackedText()
+{
+    filterText();
+    return m_strFilteredTracked;
+}
+
+int MainWindow::getTrackedTime()
+{
+    return m_nTotalTrackedTime;
+}
+
+int MainWindow::getIgnoredTime()
+{
+    return m_nTotalIgnoredTime;
+}
+
+void MainWindow::filterText()
+{
+    m_strFilteredIgnored = " ";
+    m_strFilteredTracked = " ";
+    QString strSection = " ";
+    QString strUnFiltered = ui->textEdit->toPlainText();
+    int nCurrentStartIndex = 0;
+    int nNextIndex = 0;
+
+    if (strUnFiltered.contains(SECTION_BREAK))
+    {
+        while(nNextIndex >= 0)
+        {
+            nCurrentStartIndex = strUnFiltered.indexOf(SECTION_BREAK, nNextIndex);
+            nNextIndex = strUnFiltered.indexOf(SECTION_BREAK, nCurrentStartIndex+1);
+
+            strSection = "";
+            for (int iii = nCurrentStartIndex; iii < nNextIndex; iii++)
+            {
+                 strSection.append(strUnFiltered[iii]);
+            }
+            if (strSection.contains("> Ignored <"))
+                    m_strFilteredIgnored.append(strSection);
+            else
+                m_strFilteredTracked.append(strSection);
+        }
+    }
+    return;
+
+}
+
+
+
+void MainWindow::on_actionFilter_Utility_triggered()
+{
+    FilterUtilityDialog *Filter = new FilterUtilityDialog;
+    Filter->show();
 }
