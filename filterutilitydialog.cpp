@@ -19,12 +19,10 @@ FilterUtilityDialog::~FilterUtilityDialog()
 
 void FilterUtilityDialog::on_trackedButton_clicked()
 {
-    QString TrackedText = ((MainWindow*)parentWidget())->getTrackedText();
-    qDebug() << TrackedText;
-    //ui->textBrowser->setText( TrackedText );
+    ui->textBrowser->setPlainText(((MainWindow*)parentWidget())->getTrackedText());
 }
 
 void FilterUtilityDialog::on_ignoredButton_clicked()
 {
-    ui->textBrowser->setText( ((MainWindow*)parentWidget())->getIgnoredText());
+    ui->textBrowser->setPlainText(((MainWindow*)parentWidget())->getIgnoredText());
 }

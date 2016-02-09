@@ -154,6 +154,8 @@ void MainWindow::saveLog(QString strFileName)
         {
             stmLog << "<> " << m_strLogTitle.simplified() << " <>"<<'\n';
             stmLog << ui->textEdit->toPlainText();
+            stmLog << '\n' << t.currentTime().toString("h:mm:ss A") << " <-- Program exit time." << '\n';
+            stmLog << SECTION_BREAK;
             stmLog << '\n' << '\n';
             stmLog << "Total Tracked Time:  " << millisecondsToHoursMinsSec(m_nTotalTrackedTime) << '\n';
             stmLog << "Total Time Ignored:  " << millisecondsToHoursMinsSec(m_nTotalIgnoredTime) << '\n';      // << '\n';
@@ -345,7 +347,7 @@ void MainWindow::logMissingTime()
     if (m_nLoadFileInfo == IGNORE)
     {
         m_nTotalIgnoredTime += nTimeDifference;
-        ui->textEdit->append("Time as been logged as >Ignored<.");
+        ui->textEdit->append("Time as been logged as > Ignored <.");
     }
 }
 
@@ -497,19 +499,23 @@ int MainWindow::getIgnoredTime()
 
 void MainWindow::filterText()
 {
-    m_strFilteredIgnored = " ";
-    m_strFilteredTracked = " ";
-    QString strSection = " ";
+    m_strFilteredIgnored = "";
+    m_strFilteredTracked = "";
+    QString strSection;
+
     QString strUnFiltered = ui->textEdit->toPlainText();
     int nCurrentStartIndex = 0;
     int nNextIndex = 0;
 
     if (strUnFiltered.contains(SECTION_BREAK))
     {
-        while(nNextIndex >= 0)
+
+        nNextIndex = strUnFiltered.indexOf(SECTION_BREAK);
+
+        bool bKeepGoing = true;
+        while(bKeepGoing)
         {
-            nCurrentStartIndex = strUnFiltered.indexOf(SECTION_BREAK, nNextIndex);
-            nNextIndex = strUnFiltered.indexOf(SECTION_BREAK, nCurrentStartIndex+1);
+            if (nNextIndex == strUnFiltered.length()) bKeepGoing = false;
 
             strSection = "";
             for (int iii = nCurrentStartIndex; iii < nNextIndex; iii++)
@@ -517,11 +523,27 @@ void MainWindow::filterText()
                  strSection.append(strUnFiltered[iii]);
             }
             if (strSection.contains("> Ignored <"))
-                    m_strFilteredIgnored.append(strSection);
+                m_strFilteredIgnored.append(strSection);
             else
-                m_strFilteredTracked.append(strSection);
+               m_strFilteredTracked.append(strSection);
+
+            nCurrentStartIndex = strUnFiltered.indexOf(SECTION_BREAK, nNextIndex);
+            nNextIndex = strUnFiltered.indexOf(SECTION_BREAK, nCurrentStartIndex+1);
+
+            if(nNextIndex < 0)
+            {
+                nNextIndex = strUnFiltered.length();
+
+            }
+
+
+            qDebug() <<"\nCurrent index = " << nCurrentStartIndex;
+            qDebug() << "Next Index   = " << nNextIndex;
+
         }
+            qDebug() << "length of file = " << strUnFiltered.length();
     }
+
     return;
 
 }
@@ -530,6 +552,7 @@ void MainWindow::filterText()
 
 void MainWindow::on_actionFilter_Utility_triggered()
 {
-    FilterUtilityDialog *Filter = new FilterUtilityDialog;
+    FilterUtilityDialog *Filter = new FilterUtilityDialog(this);
     Filter->show();
+    //getIgnoredText();
 }
