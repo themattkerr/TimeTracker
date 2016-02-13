@@ -30,3 +30,6 @@ FORMS    += mainwindow.ui \
     loadfiledialog.ui \
     changelogtitledialog.ui \
     filterutilitydialog.ui
+
+RESOURCES += \
+    images.qrc
