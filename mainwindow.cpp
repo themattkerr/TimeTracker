@@ -68,6 +68,7 @@ void MainWindow::initializeMemberVariables()
     m_nTotalTrackedTime = 0;
     m_nTotalIgnoredTime = 0;
     m_nTotalTime = 0;
+    m_nDeletedTime = 0;
     m_strLogTitle = "Time TracKerr";
 }
 
@@ -95,7 +96,8 @@ void MainWindow::initializeGUI()
 
 void MainWindow::on_pushButton_clicked()
 {
-    m_nElapsed = t.elapsed();
+    m_nElapsed = t.elapsed() + m_nDeletedTime;
+    m_nDeletedTime = 0;
     m_nTotalTrackedTime = m_nTotalTrackedTime + m_nElapsed;
 
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
@@ -104,22 +106,24 @@ void MainWindow::on_pushButton_clicked()
     ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime)  );
     calculateTotalTime();
     m_nPreviousLogType = TRACK;
-
+    //QTextCursor::End;
     t.restart();
 }
 
 void MainWindow::displayEllapsed()
 {
-    ui->CurrentTaskTime->setText(millisecondsToHoursMinsSec(t.elapsed()));
+
+    ui->CurrentTaskTime->setText(millisecondsToHoursMinsSec(t.elapsed()+ m_nDeletedTime));
 }
 
 void MainWindow::on_ignoreButton_clicked()
 {
-    m_nElapsed = t.elapsed();
+    m_nElapsed = t.elapsed()+ m_nDeletedTime;
+    m_nDeletedTime = 0;
     m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
 
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
-    ui->textEdit->append("> Ignored <");
+    ui->textEdit->append(IGNORE_MARKER);
     ui->textEdit->append(SECTION_BREAK);
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
 
@@ -154,9 +158,9 @@ void MainWindow::saveLog(QString strFileName)
         {
             stmLog << "<> " << m_strLogTitle.simplified() << " <>"<<'\n';
             stmLog << ui->textEdit->toPlainText();
-            stmLog << '\n' << t.currentTime().toString("h:mm:ss A") << " <-- Program exit time." << '\n';
+            stmLog << '\n';// << t.currentTime().toString("h:mm:ss A") << " <-- Program exit time." << '\n';
             stmLog << SECTION_BREAK;
-            stmLog << '\n' << '\n';
+            stmLog << '\n';
             stmLog << "Total Tracked Time:  " << millisecondsToHoursMinsSec(m_nTotalTrackedTime) << '\n';
             stmLog << "Total Time Ignored:  " << millisecondsToHoursMinsSec(m_nTotalIgnoredTime) << '\n';      // << '\n';
         }
@@ -255,7 +259,7 @@ void MainWindow::setupLog()
        }
        ui->textEdit->append(strInFile);
        ui->textEdit->append("");
-       ui->textEdit->append("===================== ");
+       ui->textEdit->append(PROGRAM_EXIT_BREAK);
        ui->textEdit->append("");
 
        if(m_nLoadFileInfo == TRACK || m_nLoadFileInfo == IGNORE)
@@ -279,8 +283,8 @@ void MainWindow::readInTrackedTime(QString &strInFile)
         TotalTime.append(strInFile.at(iii));
     }
     m_nTotalTrackedTime = stringToMilliseconds(TotalTime);
-    TotalTime.prepend("Total Tracked Time:  ");
-    TotalTime.append('\n');
+    TotalTime.prepend("\nTotal Tracked Time:  ");
+    TotalTime.append("\n");
     qDebug() << TotalTime;
     strInFile.remove(TotalTime);
 }
@@ -297,16 +301,18 @@ void MainWindow::readInIgnoredTime(QString &strInFile)
     }
     m_nTotalIgnoredTime = stringToMilliseconds(TotalTime);
     TotalTime.prepend("Total Time Ignored:  ");
-    TotalTime.append('\n');
+    TotalTime.append("\n");
     strInFile.remove(TotalTime);
 }
 
-void MainWindow::readInLastSavedTime(QString &strInFile)
+QString MainWindow::readInLastSavedTime(QString &strInFile)
 {
     QString strLastTime;
     int lastTimeIndex=0;
     int am = strInFile.lastIndexOf("AM");
     int pm = strInFile.lastIndexOf("PM");
+    if (am == pm)
+        return"";
     if (am > pm)
         lastTimeIndex = am;
     else
@@ -317,8 +323,9 @@ void MainWindow::readInLastSavedTime(QString &strInFile)
 
     }
 //qDebug() << "strLastTime = " << strLastTime;
+     strLastTime.remove('\n');
      m_nLastRecordedTime = stringToMilliseconds(strLastTime);
-
+    return strLastTime;
 }
 
 void MainWindow::logMissingTime()
@@ -343,11 +350,13 @@ void MainWindow::logMissingTime()
     {
         m_nTotalTrackedTime += nTimeDifference;
         ui->textEdit->append("Time has been logged as Tracked.");
+        ui->textEdit->append(SECTION_BREAK);
     }
     if (m_nLoadFileInfo == IGNORE)
     {
         m_nTotalIgnoredTime += nTimeDifference;
         ui->textEdit->append("Time as been logged as > Ignored <.");
+        ui->textEdit->append(SECTION_BREAK);
     }
 }
 
@@ -473,7 +482,7 @@ void MainWindow::exitWithoutSave()
 
 void MainWindow::on_actionUndo_last_time_logging_triggered()
 {
-
+    removeLastTimeEntry();
 }
 QString MainWindow::getIgnoredText()
 {
@@ -522,7 +531,7 @@ void MainWindow::filterText()
             {
                  strSection.append(strUnFiltered[iii]);
             }
-            if (strSection.contains("> Ignored <"))
+            if (strSection.contains(IGNORE_MARKER))
                 m_strFilteredIgnored.append(strSection);
             else
                m_strFilteredTracked.append(strSection);
@@ -536,12 +545,12 @@ void MainWindow::filterText()
 
             }
 
+           //m_strFilteredIgnored.remove("\n\n\n");
 
-            qDebug() <<"\nCurrent index = " << nCurrentStartIndex;
-            qDebug() << "Next Index   = " << nNextIndex;
+          // m_strFilteredTracked.remove("\n\n\n");
 
         }
-            qDebug() << "length of file = " << strUnFiltered.length();
+
     }
 
     return;
@@ -549,10 +558,83 @@ void MainWindow::filterText()
 }
 
 
-
 void MainWindow::on_actionFilter_Utility_triggered()
 {
     FilterUtilityDialog *Filter = new FilterUtilityDialog(this);
     Filter->show();
-    //getIgnoredText();
+}
+
+void MainWindow::removeLastTimeEntry()
+{
+    QString strCurrentText = ui->textEdit->toPlainText();
+    QString strSectionBreak = SECTION_BREAK;
+    QString strIgnoreMarker = IGNORE_MARKER;
+    QString strSection ="";
+    QString strTempTimeReversed = "";
+    int nSectionBreakLength = strSectionBreak.length();
+    int nCurrentTimeBreak = strCurrentText.lastIndexOf(SECTION_BREAK);
+    if(nCurrentTimeBreak < 0)
+        nCurrentTimeBreak = 0;
+    int nPreviousTimeBreak = strCurrentText.lastIndexOf(SECTION_BREAK, nCurrentTimeBreak-1);
+    if(nPreviousTimeBreak < 0 )
+        nPreviousTimeBreak = 0;
+    for (int eee = nPreviousTimeBreak; eee < nCurrentTimeBreak; eee++)
+    {
+        strSection.append(strCurrentText[eee]);
+    }
+    QString strLastTimeEntered = readInLastSavedTime(strCurrentText);
+    int nLastTime = strCurrentText.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
+
+    for (int iii = nLastTime+2; iii >=0; iii-- )
+    {
+        if(strCurrentText[iii] != '\n')
+            strTempTimeReversed.append(strCurrentText[iii]);
+        else
+            break;
+    }
+
+    QString strTemp = strTempTimeReversed;
+    for (int jjj = 0, lll = strTempTimeReversed.length()-1;jjj < (strTempTimeReversed.length()); jjj++, lll-- )
+    {
+        strTemp[lll] = strTempTimeReversed[jjj];
+    }
+
+    int nTimeToSubtract = stringToMilliseconds(strTemp);
+    strCurrentText.remove(strLastTimeEntered);
+    strCurrentText.remove(nCurrentTimeBreak,nSectionBreakLength+1);
+
+    if (strSection.contains(IGNORE_MARKER))
+    {
+        m_nTotalIgnoredTime -= nTimeToSubtract;
+
+        strCurrentText.remove((strCurrentText.lastIndexOf(IGNORE_MARKER)),(strIgnoreMarker.length()+1));
+
+
+    }
+    else
+        m_nTotalTrackedTime -= nTimeToSubtract;
+
+    strCurrentText.remove((strCurrentText.lastIndexOf(strTemp)),(strTemp.length()+1));
+
+    m_nTotalTime -= nTimeToSubtract;
+    m_nDeletedTime += nTimeToSubtract;
+
+
+    ui->textEdit->setText(strCurrentText);
+    refreshTimeTotals();
+
+}
+
+void MainWindow::refreshTimeTotals()
+{
+    if (m_nTotalIgnoredTime < 0)
+        m_nTotalIgnoredTime = 0;
+    if (m_nTotalTrackedTime < 0)
+        m_nTotalTrackedTime = 0;
+    m_nTotalTime = m_nTotalIgnoredTime + m_nTotalTrackedTime;
+
+    ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime)  );
+    ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime)  );
+    ui->totalTime->setText(millisecondsToHoursMinsSec(m_nTotalTime));
+
 }

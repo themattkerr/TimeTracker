@@ -127,8 +127,10 @@ int stringToMilliseconds (QString strTime)
         QMessageBox ConversionFail;
         ConversionFail.setText("Error! Time conversion failure. Time will not be logged");
         ConversionFail.exec();
+        return 0;
     }
-
-    //qDebug() << "Output of stringToMilliseconds = " << nTotalMilliseconds;
+    if (nTotalMilliseconds < 0)
+        return 0;
+    qDebug() << "Output of stringToMilliseconds = " << nTotalMilliseconds;
     return nTotalMilliseconds;
 }

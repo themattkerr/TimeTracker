@@ -6,6 +6,7 @@
 
 #define SECTION_BREAK "----------------------------------- "
 #define PROGRAM_EXIT_BREAK "===================== "
+#define IGNORE_MARKER "> Ignored <"
 
 enum LoadFileInfo{
     STARTNEW = 0,
@@ -72,6 +73,7 @@ private:
     int m_nTotalIgnoredTime;
     int m_nTotalTime;
     int m_nLastRecordedTime;
+    int m_nDeletedTime;
 
     int m_nLoadFileInfo;
     QString m_strFileName;
@@ -88,8 +90,10 @@ private:
     void saveLog(QString strFileName);
     void readInTrackedTime(QString &strInFile);
     void readInIgnoredTime(QString &strInFile);
-    void readInLastSavedTime(QString &strInFile);
+    QString readInLastSavedTime(QString &strInFile);
     void logMissingTime();
+    void removeLastTimeEntry();
+    void refreshTimeTotals();
 
     QString scanForTitle(QString strInput);
     QString getFileName ();
