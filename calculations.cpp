@@ -76,7 +76,7 @@ QString millisecondsToHoursMinsSec (int nMilliseconds)
 int stringToMilliseconds (QString strTime)
 {
     qDebug() << "string fed to stringToMilliseconds = " << strTime;
-
+    bool bIsPMTime = false;
     strTime.remove(" ");
     strTime.remove("h").remove("m").remove("s").remove(":").remove('\n');
     int nLength = strTime.length();
@@ -91,7 +91,8 @@ int stringToMilliseconds (QString strTime)
     int nTotalMilliseconds = 0;
     if (strReversed[1] == 'P')//this would indicate that it is PM
         {
-            nTotalMilliseconds = MILLISECONDS_PER_12HOUR;
+            //nTotalMilliseconds = MILLISECONDS_PER_12HOUR;
+            bIsPMTime = true;
         }
             strReversed.remove("A").remove("P").remove("M");
             nLength = strReversed.length();
@@ -122,6 +123,11 @@ int stringToMilliseconds (QString strTime)
             return -1;
             }
     }
+    if (nTotalMilliseconds < MILLISECONDS_PER_12HOUR && bIsPMTime)
+        nTotalMilliseconds += MILLISECONDS_PER_12HOUR;
+    if (nTotalMilliseconds > MILLISECONDS_PER_12HOUR && !bIsPMTime)
+        nTotalMilliseconds -= MILLISECONDS_PER_12HOUR;
+
     if (!ok)
     {
         QMessageBox ConversionFail;

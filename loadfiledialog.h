@@ -38,6 +38,7 @@ private slots:
 
 private:
     Ui::LoadFileDialog *ui;
+    void closeEvent(QCloseEvent *event);
 
     bool LoadFileInfo(int nLoadFileInfo);
     QString m_strFileName;

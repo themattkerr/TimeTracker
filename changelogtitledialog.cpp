@@ -7,6 +7,7 @@ ChangeLogTitleDialog::ChangeLogTitleDialog(QWidget *parent) :
     ui(new Ui::ChangeLogTitleDialog)
 {
     ui->setupUi(this);
+    ui->lineEdit->setText(((MainWindow*)parentWidget())->getLogTitle());
 }
 
 ChangeLogTitleDialog::~ChangeLogTitleDialog()

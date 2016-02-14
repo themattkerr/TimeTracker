@@ -3,6 +3,8 @@
 #include <qdialog.h>
 #include <qfiledialog.h>
 #include "mainwindow.h"
+#include <QCloseEvent>
+#include <QMessageBox>
 
 LoadFileDialog::LoadFileDialog(QWidget *parent) :
     QDialog(parent),
@@ -101,6 +103,17 @@ void LoadFileDialog::on_browseForFileName_clicked()
 void LoadFileDialog::on_LoadFileDialog_rejected()
 {
 
-    this->close();
-    ((MainWindow*)parentWidget())->exitWithoutSave();
+
+}
+
+void LoadFileDialog::closeEvent(QCloseEvent *event)
+{
+    //LoadFileInfo(EXIT_NO_SAVE);
+    //((MainWindow*)parentWidget())->exitWithoutSave();
+    //this->close();
+//   QMessageBox test;
+//   test.setText("thello");
+//   test.exec();
+
+    //event->Close;
 }

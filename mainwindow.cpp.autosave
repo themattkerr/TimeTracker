@@ -660,14 +660,11 @@ void MainWindow::refreshTimeTotals()
 
 void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
 {
-    // copy all text into QString strCurrentText
-    // find section for time in log
-        //index of regExp [][]:[][]:[][] [AP]M
-        //QTime from string
-        //compare to inserTime
-        // if < find nextIndex
-        // if > then
-        // copy section to QString strInsertSection
+    int nStartIndex = 0;
+    QString strCurrentText = ui->textEdit->toPlainText();
+    QString strSectionText = findInsertSection(strCurrentText, &tInsertTime , nStartIndex);
+    int nAmountTimeSavedInSection = findAmountTimeSavedInSection();
+   
     // find logged time in section
         //index of regexp [][]s
         //make string of time (start at s and work back)
@@ -684,4 +681,15 @@ void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
     // place new logged time right before section break.
     // set ui text to strCurrentText
 
+}
+QString MainWindow::findInsertSection(QString &strCurrentText, QTime &nInsertTime ,int &nStartIndex)
+{
+    //index of regExp [][]:[][]:[][] [AP]M
+    //QTime from string
+    //compare to inserTime
+    // if < find nextIndex
+    // if > then
+    // if at End then hide log after
+    // if at begining then hid log before. 
+    // copy section to QString strInsertSection and return the string
 }

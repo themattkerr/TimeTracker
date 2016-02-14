@@ -17,19 +17,22 @@ SOURCES += main.cpp\
     calculations.cpp \
     loadfiledialog.cpp \
     changelogtitledialog.cpp \
-    filterutilitydialog.cpp
+    filterutilitydialog.cpp \
+    inserttimedialog.cpp
 
 HEADERS  += mainwindow.h \
     calculations.h \
     loadfiledialog.h \
     constantants.h \
     changelogtitledialog.h \
-    filterutilitydialog.h
+    filterutilitydialog.h \
+    inserttimedialog.h
 
 FORMS    += mainwindow.ui \
     loadfiledialog.ui \
     changelogtitledialog.ui \
-    filterutilitydialog.ui
+    filterutilitydialog.ui \
+    inserttimedialog.ui
 
 RESOURCES += \
     images.qrc

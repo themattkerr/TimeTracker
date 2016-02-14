@@ -103,6 +103,7 @@ private:
     QString scanForTitle(QString strInput);
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
+    QString findInsertSection(QString &strCurrentText, QTime &nInsertTime ,int &nStartIndex);
 
 
 };
