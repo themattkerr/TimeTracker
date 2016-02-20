@@ -7,21 +7,21 @@
     <x>0</x>
     <y>0</y>
     <width>261</width>
-    <height>197</height>
+    <height>249</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>Insert time:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item>
     <widget class="QTimeEdit" name="timeInsertEdit">
      <property name="dateTime">
       <datetime>
@@ -38,7 +38,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item>
     <widget class="QFrame" name="frameBefore">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -59,6 +59,9 @@
         <property name="text">
          <string>Tracked</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">
@@ -71,7 +74,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item>
     <widget class="QFrame" name="frameAfter">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -92,6 +95,9 @@
         <property name="text">
          <string>Tracked</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">
@@ -102,6 +108,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="insertButton">
+     <property name="text">
+      <string>Insert</string>
+     </property>
     </widget>
    </item>
   </layout>

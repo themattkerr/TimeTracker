@@ -183,6 +183,7 @@
     </property>
     <addaction name="actionUndo_last_log_entry"/>
     <addaction name="actionUndo_last_time_logging"/>
+    <addaction name="actionInsert_time_break"/>
    </widget>
    <addaction name="menuOptions"/>
    <addaction name="menuOptions_2"/>
@@ -246,6 +247,11 @@
   <action name="actionFilter_Utility">
    <property name="text">
     <string>Filter Utility</string>
+   </property>
+  </action>
+  <action name="actionInsert_time_break">
+   <property name="text">
+    <string>Insert time break</string>
    </property>
   </action>
  </widget>

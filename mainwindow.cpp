@@ -5,6 +5,7 @@
 #include "loadfiledialog.h"
 #include "changelogtitledialog.h"
 #include "filterutilitydialog.h"
+#include "inserttimedialog.h"
 
 #include <QDateTime>
 #include <QTime>
@@ -619,6 +620,7 @@ void MainWindow::removeLastTimeEntry()
     }
 
     int nTimeToSubtract = stringToMilliseconds(strTemp);
+    //int nTimeToSubtract = stringWithTimeEnteredToMilliseconds(strCurrentText);
     strCurrentText.remove(strLastTimeEntered);
     strCurrentText.remove(nCurrentTimeBreak,nSectionBreakLength+1);
 
@@ -658,30 +660,130 @@ void MainWindow::refreshTimeTotals()
 
 }
 
+int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime)
+{
+    QString strTempTimeReversed = "";
+    int nLastTime = strStringWithSavedTime.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
+
+    for (int iii = nLastTime+2; iii >=0; iii-- )
+    {
+        if(strStringWithSavedTime[iii] != '\n')
+            strTempTimeReversed.append(strStringWithSavedTime[iii]);
+        else
+            break;
+    }
+
+    QString strTemp = strTempTimeReversed;
+    for (int jjj = 0, lll = strTempTimeReversed.length()-1;jjj < (strTempTimeReversed.length()); jjj++, lll-- )
+    {
+        strTemp[lll] = strTempTimeReversed[jjj];
+    }
+
+    return stringToMilliseconds(strTemp);
+}
+
 void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
 {
-    // copy all text into QString strCurrentText
-    // find section for time in log
-        //index of regExp [][]:[][]:[][] [AP]M
-        //QTime from string
-        //compare to inserTime
-        // if < find nextIndex
-        // if > then
-        // copy section to QString strInsertSection
-    // find logged time in section
+    int nStartIndex = 0;
+    int nEndIndex = 0;
+    QString strCurrentText = ui->textEdit->toPlainText();
+    QString strSectionText = findInsertSection(strCurrentText, tInsertTime , nStartIndex, nEndIndex);
+
+    QMessageBox h;
+    h.setText(strSectionText);
+    h.exec();
+
+    //int nAmountTimeSavedInSection = findAmountTimeSavedInSection();
+   
+    // find logged time in section(QString strCurrentText, nStartIndex
+    /*nStartIndex = 0;
+    nEndIndex = 0;
+    while (1){
+        nStartIndex = strCurrentText.indexOf(QRegExp ("[1234567890][1234567890]s"), nStartIndex);
+
+        nEndIndex = strCurrentText.indexOf(QRegExp ("[1234567890][1234567890]s"), nStartIndex+1);
+
+
+    }
+    */
         //index of regexp [][]s
         //make string of time (start at s and work back)
         //reverse string and copy it back. <-- make funciton void reverseString(QString &Input);
         //store time stringtomilliseconds(temptime)
     // Determine how time was logged
         // does section contain >ignored<
+
     // remove that time from its target (tracked or ignored)
     // remove old time and text for tracked or ignored from string
             //use remove(#,#) to remove text from a specific location
+
     // Place new time break before end of section break
     // enter new logged time before inserted time and add that time to the right place
     // enter new text that includes info about inserting new time.
     // place new logged time right before section break.
+
     // set ui text to strCurrentText
 
+}
+QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTime ,int &nStartIndex, int &nEndIndex)
+{
+    QString strFoundStartTime;
+    QString strFoundEndTime;
+
+    while (1){
+        strFoundStartTime = "";
+        strFoundEndTime = "";
+
+
+        nStartIndex = strCurrentText.indexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"),nStartIndex);
+
+        qDebug() << "current Start index = " << nStartIndex;
+
+        for (int iii = nStartIndex; iii < nStartIndex+11 ;iii++ )
+        {
+            if (strCurrentText[iii]== '\n')
+                break;
+            strFoundStartTime.append(strCurrentText[iii]);
+        }
+        QTime tStartTime = QTime::fromString(strFoundStartTime, "h:mm:ss AP");
+
+        if (tStartTime > tInsertTime)
+        {
+            return "Insert time at begining";
+        }
+
+        nEndIndex = strCurrentText.indexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"),nStartIndex+1);
+
+        for (int iii = nEndIndex; iii < nEndIndex+11 ;iii++ )
+        {
+            if (strCurrentText[iii]== '\n')
+                break;
+            strFoundEndTime.append(strCurrentText[iii]);
+        }
+
+        QTime tEndTime = QTime::fromString(strFoundEndTime, "h:mm:ss AP");
+
+        if (tEndTime > tInsertTime && tStartTime < tInsertTime )
+        {
+          break;
+        }
+        if (nStartIndex < 0 && nEndIndex < 0)
+                return "No Time present";
+        if (nStartIndex > 0 && nEndIndex < 0)
+                return "Insert time at the end";
+        nStartIndex = nEndIndex;
+    }// end while loop <---
+
+    QString strSectionText;
+    for (int III = nStartIndex; III < nEndIndex; III++)
+        strSectionText.append(strCurrentText[III]);
+
+    return strSectionText;
+
+}
+
+void MainWindow::on_actionInsert_time_break_triggered()
+{
+    InsertTimeDialog *InsertTime = new InsertTimeDialog(this);
+    InsertTime->exec();
 }

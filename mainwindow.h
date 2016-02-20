@@ -65,6 +65,8 @@ private slots:
 
     void on_actionFilter_Utility_triggered();
 
+    void on_actionInsert_time_break_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -96,6 +98,7 @@ private:
     void readInTrackedTime(QString &strInFile);
     void readInIgnoredTime(QString &strInFile);
     QString readInLastSavedTime(QString &strInFile);
+    int stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime);
     void logMissingTime();
     void removeLastTimeEntry();
     void refreshTimeTotals();
@@ -103,6 +106,7 @@ private:
     QString scanForTitle(QString strInput);
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
+    QString findInsertSection(QString &strCurrentText, QTime &tInsertTime ,int &nStartIndex, int &nEndIndex);
 
 
 };
