@@ -98,7 +98,7 @@ private:
     void readInTrackedTime(QString &strInFile);
     void readInIgnoredTime(QString &strInFile);
     QString readInLastSavedTime(QString &strInFile);
-    int stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime);
+    int stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime);
     void logMissingTime();
     void removeLastTimeEntry();
     void refreshTimeTotals();
@@ -107,6 +107,7 @@ private:
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
     QString findInsertSection(QString &strCurrentText, QTime &tInsertTime ,int &nStartIndex, int &nEndIndex);
+    int findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime);
 
 
 };

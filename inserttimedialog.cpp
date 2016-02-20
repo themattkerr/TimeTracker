@@ -20,7 +20,7 @@ InsertTimeDialog::~InsertTimeDialog()
 void InsertTimeDialog::on_insertButton_clicked()
 {
     ((MainWindow*)parentWidget())->insertTime(ui->timeInsertEdit->time()   , m_nTimeBeforeAs, m_nTimeAfterAs);
-    //this->close();
+    this->close();
 }
 
 void InsertTimeDialog::on_beforeAsTrackedRadio_clicked()

@@ -660,7 +660,7 @@ void MainWindow::refreshTimeTotals()
 
 }
 
-int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime)
+int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime)
 {
     QString strTempTimeReversed = "";
     int nLastTime = strStringWithSavedTime.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
@@ -679,39 +679,32 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
         strTemp[lll] = strTempTimeReversed[jjj];
     }
 
+    strSavedTime = strTemp;
     return stringToMilliseconds(strTemp);
 }
 
 void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
 {
+    int nStoredAs = APPEND;
+    int nIndexOfTimeStoredInSection = 0;
     int nStartIndex = 0;
     int nEndIndex = 0;
+    QString strSavedTime;
+    
     QString strCurrentText = ui->textEdit->toPlainText();
     QString strSectionText = findInsertSection(strCurrentText, tInsertTime , nStartIndex, nEndIndex);
 
-    QMessageBox h;
-    h.setText(strSectionText);
-    h.exec();
+//    QMessageBox h;
+//    h.setText(strSectionText);
+//    h.exec();
 
-    //int nAmountTimeSavedInSection = findAmountTimeSavedInSection();
+    int nAmountTimeSavedInSection = findAmountTimeSavedInSection(strSectionText, nStoredAs, nIndexOfTimeStoredInSection, strSavedTime);
    
-    // find logged time in section(QString strCurrentText, nStartIndex
-    /*nStartIndex = 0;
-    nEndIndex = 0;
-    while (1){
-        nStartIndex = strCurrentText.indexOf(QRegExp ("[1234567890][1234567890]s"), nStartIndex);
+//    qDebug() << "amount of time saved" << millisecondsToHoursMinsSec(nAmountTimeSavedInSection);
+//    qDebug() << "Stored as " << nStoredAs;
+//    qDebug() << "index of time stored in section = "<< nIndexOfTimeStoredInSection;
+//    qDebug() << "time saved string "<< strSavedTime;
 
-        nEndIndex = strCurrentText.indexOf(QRegExp ("[1234567890][1234567890]s"), nStartIndex+1);
-
-
-    }
-    */
-        //index of regexp [][]s
-        //make string of time (start at s and work back)
-        //reverse string and copy it back. <-- make funciton void reverseString(QString &Input);
-        //store time stringtomilliseconds(temptime)
-    // Determine how time was logged
-        // does section contain >ignored<
 
     // remove that time from its target (tracked or ignored)
     // remove old time and text for tracked or ignored from string
@@ -737,7 +730,7 @@ QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTim
 
         nStartIndex = strCurrentText.indexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"),nStartIndex);
 
-        qDebug() << "current Start index = " << nStartIndex;
+        //qDebug() << "current Start index = " << nStartIndex;
 
         for (int iii = nStartIndex; iii < nStartIndex+11 ;iii++ )
         {
@@ -786,4 +779,18 @@ void MainWindow::on_actionInsert_time_break_triggered()
 {
     InsertTimeDialog *InsertTime = new InsertTimeDialog(this);
     InsertTime->exec();
+}
+
+int MainWindow::findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime)
+{
+    if (strSectionText.contains(IGNORE_MARKER))
+        nStoredAs = IGNORE;
+    else if (strSectionText.contains(QRegExp ("[1234567890][1234567890]s")))
+        nStoredAs = TRACK;
+    else
+        nStoredAs = APPEND;
+
+    nIndexOfTimeStoredInSection = strSectionText.indexOf(QRegExp ("[1234567890][1234567890]s"));
+
+    return stringWithTimeEnteredToMilliseconds(strSectionText, strSavedTime);
 }
