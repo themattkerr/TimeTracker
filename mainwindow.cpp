@@ -683,45 +683,13 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
     return stringToMilliseconds(strTemp);
 }
 
-void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
-{
-    int nStoredAs = APPEND;
-    int nIndexOfTimeStoredInSection = 0;
-    int nStartIndex = 0;
-    int nEndIndex = 0;
-    QString strSavedTime;
-    
-    QString strCurrentText = ui->textEdit->toPlainText();
-    QString strSectionText = findInsertSection(strCurrentText, tInsertTime , nStartIndex, nEndIndex);
 
-//    QMessageBox h;
-//    h.setText(strSectionText);
-//    h.exec();
-
-    int nAmountTimeSavedInSection = findAmountTimeSavedInSection(strSectionText, nStoredAs, nIndexOfTimeStoredInSection, strSavedTime);
-   
-//    qDebug() << "amount of time saved" << millisecondsToHoursMinsSec(nAmountTimeSavedInSection);
-//    qDebug() << "Stored as " << nStoredAs;
-//    qDebug() << "index of time stored in section = "<< nIndexOfTimeStoredInSection;
-//    qDebug() << "time saved string "<< strSavedTime;
-
-
-    // remove that time from its target (tracked or ignored)
-    // remove old time and text for tracked or ignored from string
-            //use remove(#,#) to remove text from a specific location
-
-    // Place new time break before end of section break
-    // enter new logged time before inserted time and add that time to the right place
-    // enter new text that includes info about inserting new time.
-    // place new logged time right before section break.
-
-    // set ui text to strCurrentText
-
-}
-QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTime ,int &nStartIndex, int &nEndIndex)
+QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTime, int nBeforeTime, int &nAfterTime ,int &nStartIndex, int &nEndIndex)
 {
     QString strFoundStartTime;
     QString strFoundEndTime;
+    QTime tStartTime;
+    QTime tEndTime;
 
     while (1){
         strFoundStartTime = "";
@@ -738,7 +706,7 @@ QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTim
                 break;
             strFoundStartTime.append(strCurrentText[iii]);
         }
-        QTime tStartTime = QTime::fromString(strFoundStartTime, "h:mm:ss AP");
+        tStartTime = QTime::fromString(strFoundStartTime, "h:mm:ss AP");
 
         if (tStartTime > tInsertTime)
         {
@@ -754,7 +722,7 @@ QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTim
             strFoundEndTime.append(strCurrentText[iii]);
         }
 
-        QTime tEndTime = QTime::fromString(strFoundEndTime, "h:mm:ss AP");
+        tEndTime = QTime::fromString(strFoundEndTime, "h:mm:ss AP");
 
         if (tEndTime > tInsertTime && tStartTime < tInsertTime )
         {
@@ -770,6 +738,9 @@ QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTim
     QString strSectionText;
     for (int III = nStartIndex; III < nEndIndex; III++)
         strSectionText.append(strCurrentText[III]);
+
+    nBeforeTime = tInsertTime.msec() - tStartTime.msec();
+    nAfterTime = tEndTime.msec() -  tInsertTime.msec();
 
     return strSectionText;
 
@@ -793,4 +764,118 @@ int MainWindow::findAmountTimeSavedInSection(QString &strSectionText, int &nStor
     nIndexOfTimeStoredInSection = strSectionText.indexOf(QRegExp ("[1234567890][1234567890]s"));
 
     return stringWithTimeEnteredToMilliseconds(strSectionText, strSavedTime);
+}
+
+void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
+{
+
+    int nBeforeTime;
+    int nAfterTime;
+    int nStoredAs = APPEND;
+    int nIndexOfTimeStoredInSection = 0;
+    int nStartIndex = 0;
+    int nEndIndex = 0;
+    QString strSavedTime;
+
+    QString strCurrentText = ui->textEdit->toPlainText();
+    QString strSectionText = findInsertSection(strCurrentText, tInsertTime ,nBeforeTime, nAfterTime, nStartIndex, nEndIndex);
+
+
+
+    int nAmountTimeSavedInSection = findAmountTimeSavedInSection(strSectionText, nStoredAs, nIndexOfTimeStoredInSection, strSavedTime);
+
+//    qDebug() << "amount of time saved" << millisecondsToHoursMinsSec(nAmountTimeSavedInSection);
+//    qDebug() << "Stored as " << nStoredAs;
+//    qDebug() << "index of time stored in section = "<< nIndexOfTimeStoredInSection;
+//    qDebug() << "time saved string "<< strSavedTime;
+
+//    QMessageBox h;
+//    h.setText(strSectionText);
+//    h.exec();
+
+    setAndRemoveTimesForInsertTime(tInsertTime, strCurrentText,
+                                   nLogBeforeAs,    LogAfterAs,
+                                   nStartIndex,     nEndIndex,
+                                   nBeforeTime,     nAfterTime,
+                                   nIndexOfTimeStoredInSection,
+                                   strSavedTime,    nStoredAs,
+                                   nAmountTimeSavedInSection
+                                   );
+
+
+
+
+    // remove that time from its target (tracked or ignored)
+    // remove old time and text for tracked or ignored from string
+            //use remove(#,#) to remove text from a specific location
+
+    // Place new time break before end of section break
+    // enter new logged time before inserted time and add that time to the right place
+    // enter new text that includes info about inserting new time.
+    // place new logged time right before section break.
+
+    // set ui text to strCurrentText
+
+}
+
+void  MainWindow::setAndRemoveTimesForInsertTime(
+                                        QTime &tInsertTime, QString &strCurrentText,
+                                        int &nLogBeforeAs,   int &nLogAfterAs,
+                                        int &nStartIndex,    int &nEndIndex,
+                                        int nBeforeTime,  int &nAfterTime,
+                                        int &nIndexOfTimeStoredInSection,
+                                        QString &strSavedTime, int &nStoredAs,
+                                        int &nAmountTimeSavedInSection
+                                        )
+{
+    if (nStoredAs == TRACK)
+    {
+        m_nTotalTrackedTime -= nAmountTimeSavedInSection;
+        m_nTotalTime -= nAmountTimeSavedInSection;
+    }
+    if (nStoredAs == IGNORE)
+    {
+        m_nTotalIgnoredTime -= nAmountTimeSavedInSection;
+        m_nTotalTime -= nAmountTimeSavedInSection;
+    }
+    if (nStoredAs == APPEND)
+    {
+
+    }
+
+
+
+
+    if (nLogBeforeAs == TRACK)
+    {
+        m_nTotalTrackedTime += nBeforeTime;
+        m_nTotalTime += nBeforeTime;
+    }
+    if (nLogBeforeAs == IGNORE)
+    {
+        m_nTotalIgnoredTime += nBeforeTime;
+        m_nTotalTime += nBeforeTime;
+    }
+    if (nLogBeforeAs == APPEND)
+    {
+
+    }
+
+
+
+    if (nLogAfterAs == TRACK)
+    {
+        m_nTotalTrackedTime += nAfterTime;
+        m_nTotalTime += nAfterTime;
+    }
+    if (nLogAfterAs == IGNORE)
+    {
+        m_nTotalIgnoredTime += nAfterTime;
+        m_nTotalTime += nAfterTime;
+    }
+    if (nLogAfterAs == APPEND)
+    {
+
+    }
+
 }

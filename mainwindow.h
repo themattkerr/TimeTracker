@@ -106,9 +106,13 @@ private:
     QString scanForTitle(QString strInput);
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
-    QString findInsertSection(QString &strCurrentText, QTime &tInsertTime ,int &nStartIndex, int &nEndIndex);
+    QString findInsertSection(QString &strCurrentText, QTime &tInsertTime , int nBeforeTime, int &nAfterTime, int &nStartIndex, int &nEndIndex);
     int findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime);
-
+    void     setAndRemoveTimesForInsertTime(QTime &tInsertTime, QString &strCurrentText,
+                                            int &nLogBeforeAs,   int &nLogAfterAs,
+                                            int &nStartIndex,    int &nEndIndex, int nBeforeTime, int &nAfterTime,
+                                            int &nIndexOfTimeStoredInSection,
+                                            QString &strSavedTime, int &nStoredAs, int &nAmountTimeSavedInSection);
 
 };
 
