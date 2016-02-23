@@ -140,3 +140,11 @@ int stringToMilliseconds (QString strTime)
     qDebug() << "Output of stringToMilliseconds = " << nTotalMilliseconds;
     return nTotalMilliseconds;
 }
+
+int TimeDifferencInMilliseconds (QString strFirstTime, QString strSecondTime)
+{
+    int nT1 = stringToMilliseconds(strFirstTime);
+    int nT2 = stringToMilliseconds(strSecondTime);
+    int nTimeDifferrence = abs(nT2-nT1);
+    return nTimeDifferrence;
+}

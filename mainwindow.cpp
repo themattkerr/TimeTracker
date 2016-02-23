@@ -49,13 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     calculateTotalTime();
     initializeGUI();
-//    if(m_bExitNow)
-//    {
-//        QMessageBox m;
-//        m.setText("why this no work");
-//        m.exec();
 
-//    }
     t.start();
 }
 
@@ -105,6 +99,7 @@ void MainWindow::initializeGUI()
     ui->totalTimeLabel->hide();
     ui->totalTime->hide();
 
+    ui->textEdit->append(SECTION_BREAK);
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
 }
 
@@ -332,10 +327,12 @@ QString MainWindow::readInLastSavedTime(QString &strInFile)
         lastTimeIndex = am;
     else
         lastTimeIndex = pm;
-    for (int iii = (lastTimeIndex-9); iii < lastTimeIndex + 2 ; iii ++)
+    int nTempIndex = (lastTimeIndex-9);
+    if(nTempIndex < 0)
+        nTempIndex =0;
+    for (int iii = nTempIndex; iii < lastTimeIndex + 2 ; iii ++)
     {
         strLastTime.append(strInFile.at(iii));
-
     }
 
      strLastTime.remove('\n');
@@ -421,11 +418,7 @@ void MainWindow::on_actionUndo_last_log_entry_triggered()
 
         m_nPreviousLogType = TRACK;
     }
-
-
 }
-
-
 
 void MainWindow::on_actionShow_Time_Ignored_triggered(bool checked)
 {
@@ -504,6 +497,7 @@ void MainWindow::on_actionUndo_last_time_logging_triggered()
 {
     removeLastTimeEntry();
 }
+
 QString MainWindow::getIgnoredText()
 {
     filterText();
@@ -562,12 +556,7 @@ void MainWindow::filterText()
             if(nNextIndex < 0)
             {
                 nNextIndex = strUnFiltered.length();
-
             }
-
-           //m_strFilteredIgnored.remove("\n\n\n");
-
-          // m_strFilteredTracked.remove("\n\n\n");
 
         }
 
@@ -576,7 +565,6 @@ void MainWindow::filterText()
     return;
 
 }
-
 
 void MainWindow::on_actionFilter_Utility_triggered()
 {
@@ -620,7 +608,6 @@ void MainWindow::removeLastTimeEntry()
     }
 
     int nTimeToSubtract = stringToMilliseconds(strTemp);
-    //int nTimeToSubtract = stringWithTimeEnteredToMilliseconds(strCurrentText);
     strCurrentText.remove(strLastTimeEntered);
     strCurrentText.remove(nCurrentTimeBreak,nSectionBreakLength+1);
 
@@ -664,7 +651,8 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
 {
     QString strTempTimeReversed = "";
     int nLastTime = strStringWithSavedTime.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
-
+    if (nLastTime < 0)
+        return -1;
     for (int iii = nLastTime+2; iii >=0; iii-- )
     {
         if(strStringWithSavedTime[iii] != '\n')
@@ -680,16 +668,20 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
     }
 
     strSavedTime = strTemp;
+    qDebug() << " temp file" << strTemp;
+    qDebug () << "strSaved time = " <<strSavedTime;
+
     return stringToMilliseconds(strTemp);
 }
 
-
-QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTime, int nBeforeTime, int &nAfterTime ,int &nStartIndex, int &nEndIndex)
+QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTime, int &nBeforeTime, int &nAfterTime ,int &nStartIndex, int &nEndIndex)
 {
     QString strFoundStartTime;
     QString strFoundEndTime;
-    QTime tStartTime;
-    QTime tEndTime;
+
+    int nStartTime = 0;
+    int nEndTime = 0;
+    int nInsertTime = stringToMilliseconds(tInsertTime.toString("h:mm:ss PM"));
 
     while (1){
         strFoundStartTime = "";
@@ -697,50 +689,73 @@ QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTim
 
 
         nStartIndex = strCurrentText.indexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"),nStartIndex);
+        if (nStartIndex > 0)
+            if(strCurrentText[nStartIndex - 1] == '1')
+                nStartIndex -= 1;
 
-        //qDebug() << "current Start index = " << nStartIndex;
 
         for (int iii = nStartIndex; iii < nStartIndex+11 ;iii++ )
         {
-            if (strCurrentText[iii]== '\n')
-                break;
             strFoundStartTime.append(strCurrentText[iii]);
-        }
-        tStartTime = QTime::fromString(strFoundStartTime, "h:mm:ss AP");
-
-        if (tStartTime > tInsertTime)
-        {
-            return "Insert time at begining";
-        }
-
-        nEndIndex = strCurrentText.indexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"),nStartIndex+1);
-
-        for (int iii = nEndIndex; iii < nEndIndex+11 ;iii++ )
-        {
-            if (strCurrentText[iii]== '\n')
+            if (strCurrentText[iii]== 'M')
                 break;
-            strFoundEndTime.append(strCurrentText[iii]);
+
         }
 
-        tEndTime = QTime::fromString(strFoundEndTime, "h:mm:ss AP");
-
-        if (tEndTime > tInsertTime && tStartTime < tInsertTime )
+        nStartTime = stringToMilliseconds(strFoundStartTime);
+        if (nStartTime > nInsertTime)
         {
-          break;
+            nBeforeTime = -1;
+            nAfterTime = nStartTime - nInsertTime;
+            return ADD_TO_BEGINING;
         }
-        if (nStartIndex < 0 && nEndIndex < 0)
-                return "No Time present";
+
+        nEndIndex = strCurrentText.indexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"),nStartIndex+2);
+        if (nEndIndex > 0)
+        {
+            if (strCurrentText[nEndIndex-1] == '1')
+                nEndIndex -= 1;
+
+            for (int iii = nEndIndex; iii < nEndIndex+11 ;iii++ )
+            {
+                strFoundEndTime.append(strCurrentText[iii]);
+                if (strCurrentText[iii]== 'M')
+                    break;
+
+            }
+
+            nEndTime = stringToMilliseconds(strFoundEndTime);
+
+            if (nEndTime > nInsertTime && nStartTime < nInsertTime )
+            {
+              break;
+            }
+            if (nStartIndex < 0 && nEndIndex < 0)
+                return ONLY_INSERTED_TIME;
+        }
         if (nStartIndex > 0 && nEndIndex < 0)
-                return "Insert time at the end";
+        {
+            nBeforeTime = nInsertTime - nStartTime;
+            nAfterTime = -1;
+            return ADD_TO_END;
+        }
         nStartIndex = nEndIndex;
     }// end while loop <---
+
+
 
     QString strSectionText;
     for (int III = nStartIndex; III < nEndIndex; III++)
         strSectionText.append(strCurrentText[III]);
 
-    nBeforeTime = tInsertTime.msec() - tStartTime.msec();
-    nAfterTime = tEndTime.msec() -  tInsertTime.msec();
+
+    nBeforeTime = nInsertTime - nStartTime;
+    nAfterTime = nEndTime - nInsertTime;
+
+    if(nBeforeTime < 0)
+        nBeforeTime = 0;
+    if(nAfterTime < 0)
+        nAfterTime = 0;
 
     return strSectionText;
 
@@ -766,116 +781,132 @@ int MainWindow::findAmountTimeSavedInSection(QString &strSectionText, int &nStor
     return stringWithTimeEnteredToMilliseconds(strSectionText, strSavedTime);
 }
 
-void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs)
+void MainWindow::insertTime(QTime tInsertTime, int nLogBeforeAs, int nLogAfterAs)
 {
 
-    int nBeforeTime;
-    int nAfterTime;
+    int nBeforeTime = 0;
+    int nAfterTime = 0;
     int nStoredAs = APPEND;
     int nIndexOfTimeStoredInSection = 0;
     int nStartIndex = 0;
     int nEndIndex = 0;
+    int nAmountTimeSavedInSection;
     QString strSavedTime;
 
     QString strCurrentText = ui->textEdit->toPlainText();
     QString strSectionText = findInsertSection(strCurrentText, tInsertTime ,nBeforeTime, nAfterTime, nStartIndex, nEndIndex);
 
+            if (strSectionText == ADD_TO_BEGINING)   {nLogBeforeAs = APPEND;}
+            if (strSectionText == ADD_TO_END)        {nLogAfterAs = APPEND; }
+            if (strSectionText == ONLY_INSERTED_TIME){nLogBeforeAs = APPEND; nLogAfterAs = APPEND;}
 
 
-    int nAmountTimeSavedInSection = findAmountTimeSavedInSection(strSectionText, nStoredAs, nIndexOfTimeStoredInSection, strSavedTime);
-
-//    qDebug() << "amount of time saved" << millisecondsToHoursMinsSec(nAmountTimeSavedInSection);
-//    qDebug() << "Stored as " << nStoredAs;
-//    qDebug() << "index of time stored in section = "<< nIndexOfTimeStoredInSection;
-//    qDebug() << "time saved string "<< strSavedTime;
-
-//    QMessageBox h;
-//    h.setText(strSectionText);
-//    h.exec();
+    if (strSectionText != ADD_TO_BEGINING || strSectionText != ADD_TO_END || strSectionText != ONLY_INSERTED_TIME)
+        nAmountTimeSavedInSection = findAmountTimeSavedInSection(strSectionText, nStoredAs, nIndexOfTimeStoredInSection, strSavedTime);
 
     setAndRemoveTimesForInsertTime(tInsertTime, strCurrentText,
-                                   nLogBeforeAs,    LogAfterAs,
+                                   nLogBeforeAs,    nLogAfterAs,
                                    nStartIndex,     nEndIndex,
                                    nBeforeTime,     nAfterTime,
                                    nIndexOfTimeStoredInSection,
                                    strSavedTime,    nStoredAs,
-                                   nAmountTimeSavedInSection
+                                   nAmountTimeSavedInSection,
+                                   strSectionText
                                    );
-
-
-
-
-    // remove that time from its target (tracked or ignored)
-    // remove old time and text for tracked or ignored from string
-            //use remove(#,#) to remove text from a specific location
-
-    // Place new time break before end of section break
-    // enter new logged time before inserted time and add that time to the right place
-    // enter new text that includes info about inserting new time.
-    // place new logged time right before section break.
-
-    // set ui text to strCurrentText
 
 }
 
-void  MainWindow::setAndRemoveTimesForInsertTime(
+void MainWindow::setAndRemoveTimesForInsertTime(
                                         QTime &tInsertTime, QString &strCurrentText,
                                         int &nLogBeforeAs,   int &nLogAfterAs,
                                         int &nStartIndex,    int &nEndIndex,
-                                        int nBeforeTime,  int &nAfterTime,
+                                        int &nBeforeTime,  int &nAfterTime,
                                         int &nIndexOfTimeStoredInSection,
                                         QString &strSavedTime, int &nStoredAs,
-                                        int &nAmountTimeSavedInSection
+                                        int &nAmountTimeSavedInSection,
+                                        QString &strSectionText
                                         )
-{
-    if (nStoredAs == TRACK)
     {
-        m_nTotalTrackedTime -= nAmountTimeSavedInSection;
-        m_nTotalTime -= nAmountTimeSavedInSection;
-    }
-    if (nStoredAs == IGNORE)
-    {
-        m_nTotalIgnoredTime -= nAmountTimeSavedInSection;
-        m_nTotalTime -= nAmountTimeSavedInSection;
-    }
-    if (nStoredAs == APPEND)
-    {
+        QString strInsertText = "";
+        int nInsertLocation = 0;
+
+        if (strSectionText.contains(IGNORE_MARKER))
+        {
+            QString strTemp = IGNORE_MARKER;
+            strCurrentText.remove((nStartIndex + strSectionText.indexOf(IGNORE_MARKER)), strTemp.length());
+        }
+        if (strSectionText != ADD_TO_BEGINING || strSectionText != ADD_TO_END || strSectionText != ONLY_INSERTED_TIME)
+        {
+            nInsertLocation = (strCurrentText.indexOf(strSavedTime, nStartIndex));
+            strCurrentText.remove(nInsertLocation, strSavedTime.length() );
+        }
+        if (strSectionText == ADD_TO_BEGINING ||strSectionText == ONLY_INSERTED_TIME)
+            nInsertLocation = 0;
+        if (strSectionText == ADD_TO_END)
+            nInsertLocation = strCurrentText.length();
+
+        if (nStoredAs == TRACK)
+        {
+            m_nTotalTrackedTime -= nAmountTimeSavedInSection;
+            m_nTotalTime -= nAmountTimeSavedInSection;
+        }
+        if (nStoredAs == IGNORE)
+        {
+            m_nTotalIgnoredTime -= nAmountTimeSavedInSection;
+            m_nTotalTime -= nAmountTimeSavedInSection;
+        }
+        if (nStoredAs == APPEND)
+        {
+
+        }
+
+        if(nLogBeforeAs == TRACK ||nLogBeforeAs == IGNORE)
+            strInsertText.append('\n').append(millisecondsToHoursMinsSec(nBeforeTime)).append('\n');
+
+        if (nLogBeforeAs == TRACK)
+        {
+            m_nTotalTrackedTime += nBeforeTime;
+            m_nTotalTime += nBeforeTime;
+
+        }
+        if (nLogBeforeAs == IGNORE)
+        {
+            m_nTotalIgnoredTime += nBeforeTime;
+            m_nTotalTime += nBeforeTime;
+
+            strInsertText.append(IGNORE_MARKER).append('\n');
+        }
+        if (nLogBeforeAs == APPEND)
+        {
+
+        }
+
+        strInsertText.append(INSERT_MARKER);
+        strInsertText.append(SECTION_BREAK).append('\n');
+        strInsertText.append(tInsertTime.toString("h:mm:ss AP")).append('\n');
+
+        if(nLogAfterAs == TRACK || nLogAfterAs == IGNORE)
+            strInsertText.append(millisecondsToHoursMinsSec(nAfterTime)).append('\n');
+
+        if (nLogAfterAs == TRACK)
+        {
+            m_nTotalTrackedTime += nAfterTime;
+            m_nTotalTime += nAfterTime;
+        }
+        if (nLogAfterAs == IGNORE)
+        {
+            m_nTotalIgnoredTime += nAfterTime;
+            m_nTotalTime += nAfterTime;
+            strInsertText.append(IGNORE_MARKER).append('\n');
+        }
+        if (nLogAfterAs == APPEND)
+        {
+
+        }
+
+        strCurrentText.insert(nInsertLocation, strInsertText);
+        ui->textEdit->setText(strCurrentText);
+        refreshTimeTotals();
+
 
     }
-
-
-
-
-    if (nLogBeforeAs == TRACK)
-    {
-        m_nTotalTrackedTime += nBeforeTime;
-        m_nTotalTime += nBeforeTime;
-    }
-    if (nLogBeforeAs == IGNORE)
-    {
-        m_nTotalIgnoredTime += nBeforeTime;
-        m_nTotalTime += nBeforeTime;
-    }
-    if (nLogBeforeAs == APPEND)
-    {
-
-    }
-
-
-
-    if (nLogAfterAs == TRACK)
-    {
-        m_nTotalTrackedTime += nAfterTime;
-        m_nTotalTime += nAfterTime;
-    }
-    if (nLogAfterAs == IGNORE)
-    {
-        m_nTotalIgnoredTime += nAfterTime;
-        m_nTotalTime += nAfterTime;
-    }
-    if (nLogAfterAs == APPEND)
-    {
-
-    }
-
-}

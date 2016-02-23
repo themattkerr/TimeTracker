@@ -7,6 +7,10 @@
 #define SECTION_BREAK "----------------------------------- "
 #define PROGRAM_EXIT_BREAK "===================== "
 #define IGNORE_MARKER "> Ignored <"
+#define INSERT_MARKER "\n+++ Time inserted +++\n"
+#define ADD_TO_BEGINING "Add to begining"
+#define ADD_TO_END "Add to end"
+#define ONLY_INSERTED_TIME "No other time found"
 
 enum LoadFileInfo{
     STARTNEW = 0,
@@ -33,7 +37,7 @@ public:
     void setFileName(QString strFileName);
     void exitWithoutSave();
     void filterText();
-    void insertTime(QTime tInsertTime, int nLogBeforeAs, int LogAfterAs);
+    void insertTime(QTime tInsertTime, int nLogBeforeAs, int nLogAfterAs);
 
     QString getLogTitle();
     QString getIgnoredText();
@@ -106,13 +110,13 @@ private:
     QString scanForTitle(QString strInput);
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
-    QString findInsertSection(QString &strCurrentText, QTime &tInsertTime , int nBeforeTime, int &nAfterTime, int &nStartIndex, int &nEndIndex);
+    QString findInsertSection(QString &strCurrentText, QTime &tInsertTime , int &nBeforeTime, int &nAfterTime, int &nStartIndex, int &nEndIndex);
     int findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime);
     void     setAndRemoveTimesForInsertTime(QTime &tInsertTime, QString &strCurrentText,
                                             int &nLogBeforeAs,   int &nLogAfterAs,
-                                            int &nStartIndex,    int &nEndIndex, int nBeforeTime, int &nAfterTime,
+                                            int &nStartIndex,    int &nEndIndex, int &nBeforeTime, int &nAfterTime,
                                             int &nIndexOfTimeStoredInSection,
-                                            QString &strSavedTime, int &nStoredAs, int &nAmountTimeSavedInSection);
+                                            QString &strSavedTime, int &nStoredAs, int &nAmountTimeSavedInSection, QString &strSectionText);
 
 };
 
