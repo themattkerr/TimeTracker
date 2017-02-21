@@ -137,7 +137,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>42</width>
+          <width>75</width>
           <height>16777215</height>
          </size>
         </property>
@@ -156,7 +156,7 @@
      <x>0</x>
      <y>0</y>
      <width>250</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOptions">
@@ -165,7 +165,6 @@
     </property>
     <addaction name="actionChange_log_name"/>
     <addaction name="actionChange_log_title"/>
-    <addaction name="actionLoad_saved_log"/>
     <addaction name="actionFilter_Utility"/>
    </widget>
    <widget class="QMenu" name="menuOptions_2">
@@ -179,15 +178,15 @@
    </widget>
    <widget class="QMenu" name="menuUndo">
     <property name="title">
-     <string>Undo</string>
+     <string>Edit</string>
     </property>
     <addaction name="actionUndo_last_log_entry"/>
     <addaction name="actionUndo_last_time_logging"/>
     <addaction name="actionInsert_time_break"/>
    </widget>
    <addaction name="menuOptions"/>
-   <addaction name="menuOptions_2"/>
    <addaction name="menuUndo"/>
+   <addaction name="menuOptions_2"/>
   </widget>
   <action name="actionShow_current_task_counter">
    <property name="checkable">
@@ -199,7 +198,7 @@
   </action>
   <action name="actionUndo_last_log_entry">
    <property name="text">
-    <string>Swap last Tracked vs Ignored</string>
+    <string>Swap last Tracked and Ignored</string>
    </property>
   </action>
   <action name="actionChange_log_name">

@@ -7,7 +7,7 @@
 #define SECTION_BREAK "----------------------------------- "
 #define PROGRAM_EXIT_BREAK "===================== "
 #define IGNORE_MARKER "> Ignored <"
-#define INSERT_MARKER "\n+++ Time inserted +++\n"
+#define INSERT_MARKER "+++ Time inserted +++\n"
 #define ADD_TO_BEGINING "Add to begining"
 #define ADD_TO_END "Add to end"
 #define ONLY_INSERTED_TIME "No other time found"

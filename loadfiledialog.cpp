@@ -27,9 +27,6 @@ LoadFileDialog::~LoadFileDialog()
 void LoadFileDialog::on_addToExistingButton_clicked()
 {
     showImportOptions();
-
-    //setLoadFileInfo(STARTNEW);
-
 }
 
 void LoadFileDialog::showImportOptions()
@@ -62,10 +59,7 @@ void LoadFileDialog::on_continueButton_clicked()
 bool LoadFileDialog::LoadFileInfo(int nLoadFileInfo)
 {
     ((MainWindow*)parentWidget())->SetLoadFileInfo(nLoadFileInfo);
-
 }
-
-
 
 void LoadFileDialog::on_logTimeCheckBox_toggled(bool checked)
 {
@@ -94,7 +88,7 @@ void LoadFileDialog::on_startNewButton_clicked()
 
 void LoadFileDialog::on_browseForFileName_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select a file"), "Files", tr("Time Tracker log files (*.txt)") );
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select a file"), "TimeTracKerrFiles/", tr("Time Tracker log files (*.txt)") );
     ((MainWindow*)parentWidget())->setFileName(fileName);
     showImportOptions();
     ((MainWindow*)parentWidget())->SetLogTitle("Loaded Saved Log");
