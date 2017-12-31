@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     loadfiledialog.cpp \
     changelogtitledialog.cpp \
     filterutilitydialog.cpp \
-    inserttimedialog.cpp
+    inserttimedialog.cpp \
+    #../../../../OneDrive/Documents/QT Test Folder/General_Library/mattcalculations.cpp \
+    #../../../../OneDrive/Documents/QT Test Folder/General_Library/mattcalculations.cpp
 
 HEADERS  += mainwindow.h \
     calculations.h \
@@ -26,7 +28,9 @@ HEADERS  += mainwindow.h \
     constantants.h \
     changelogtitledialog.h \
     filterutilitydialog.h \
-    inserttimedialog.h
+    inserttimedialog.h \
+    #../../../../OneDrive/Documents/QT Test Folder/General_Library/mattcalculations.h \
+    #../../../../OneDrive/Documents/QT Test Folder/General_Library/mattcalculations.h
 
 FORMS    += mainwindow.ui \
     loadfiledialog.ui \
@@ -36,3 +40,12 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     images.qrc
+
+RC_FILE = res.rc
+
+DISTFILES += \
+    res.rc \
+    install.nsi
+
+#QMAKE_POST_LINK += windeployqt \"$$system_path($${OUT_PWD}/release/TestTime.exe)\" --dir \"$$system_path($${_PRO_FILE_PWD_}/Deploy)\"
+#QMAKE_POST_LINK += && $$QMAKE_COPY \"$$system_path($${OUT_PWD}/release/TestTime.exe)\" \"$$system_path($${_PRO_FILE_PWD_}/Deploy/)\"

@@ -71,6 +71,10 @@ private slots:
 
     void on_actionInsert_time_break_triggered();
 
+    void on_fontSize_spinBox_valueChanged(int arg1);
+
+    void on_fontComboBox_activated(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
 
@@ -106,6 +110,7 @@ private:
     void logMissingTime();
     void removeLastTimeEntry();
     void refreshTimeTotals();
+    void refreshTextEdit();
 
     QString scanForTitle(QString strInput);
     QString getFileName ();

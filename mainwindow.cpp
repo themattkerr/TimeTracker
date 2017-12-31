@@ -51,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     calculateTotalTime();
     initializeGUI();
 
+
     t.start();
 }
 
@@ -102,6 +103,9 @@ void MainWindow::initializeGUI()
 
     ui->textEdit->append(SECTION_BREAK);
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
+
+    ui->fontSize_spinBox->setValue(12);
+
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -251,6 +255,8 @@ void MainWindow::setupLog()
    while (!file.atEnd())
    {
        QString strInFile = in.readAll();
+
+
        strInFile = scanForTitle(strInFile);
 
        if (strInFile.contains("Total Tracked Time:  "))
@@ -265,6 +271,8 @@ void MainWindow::setupLog()
        {
            readInLastSavedTime(strInFile);
        }
+       int nRemoveFromLocation = strInFile.lastIndexOf (SECTION_BREAK); //  remove( SECTION_BREAK );
+       strInFile.remove(nRemoveFromLocation, 36);
        ui->textEdit->append(strInFile);
        ui->textEdit->append("");
        ui->textEdit->append(PROGRAM_EXIT_BREAK);
@@ -635,7 +643,7 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
         return -1;
     for (int iii = nLastTime+2; iii >=0; iii-- )
     {
-        if(strStringWithSavedTime[iii] != '\n')
+        if(strStringWithSavedTime[iii] != '\n' && strStringWithSavedTime[iii] != ' ')
             strTempTimeReversed.append(strStringWithSavedTime[iii]);
         else
             break;
@@ -910,3 +918,26 @@ void MainWindow::setAndRemoveTimesForInsertTime(
 
 
     }
+
+void MainWindow::on_fontSize_spinBox_valueChanged(int arg1)
+{
+    ui->textEdit->setFontPointSize(arg1);
+    refreshTextEdit();
+
+
+}
+void MainWindow::refreshTextEdit()
+{
+    QString strTemp;
+    strTemp = ui->textEdit->toPlainText();
+    ui->textEdit->clear();
+    ui->textEdit->setText(strTemp);
+
+    ui->textEdit->moveCursor(QTextCursor::End , QTextCursor::MoveAnchor ) ;
+
+}
+
+void MainWindow::on_fontComboBox_activated(const QString &arg1)
+{
+    refreshTextEdit();
+}

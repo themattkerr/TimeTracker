@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
-    <height>225</height>
+    <width>289</width>
+    <height>274</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -110,6 +110,36 @@
      </layout>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QFontComboBox" name="fontComboBox">
+        <property name="currentFont">
+         <font>
+          <family>Arial</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="fontSize_spinBox"/>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QTextEdit" name="textEdit"/>
     </item>
     <item>
@@ -155,8 +185,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>250</width>
-     <height>17</height>
+     <width>289</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOptions">
@@ -258,5 +288,22 @@
  <resources>
   <include location="images.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>fontComboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>textEdit</receiver>
+   <slot>setFontFamily(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>79</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

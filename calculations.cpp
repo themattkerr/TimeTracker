@@ -148,3 +148,38 @@ int TimeDifferencInMilliseconds (QString strFirstTime, QString strSecondTime)
     int nTimeDifferrence = abs(nT2-nT1);
     return nTimeDifferrence;
 }
+
+QString removeAllLettersFromString(QString strInputString)
+{
+    QString strOutput = strInputString;
+
+    strOutput
+            .remove('A').remove('a')
+            .remove('B').remove('b')
+            .remove('C').remove('c')
+            .remove('D').remove('d')
+            .remove('E').remove('e')
+            .remove('F').remove('f')
+            .remove('G').remove('g')
+            .remove('H').remove('h')
+            .remove('I').remove('i')
+            .remove('J').remove('j')
+            .remove('K').remove('k')
+            .remove('L').remove('l')
+            .remove('M').remove('m')
+            .remove('N').remove('n')
+            .remove('O').remove('o')
+            .remove('P').remove('p')
+            .remove('Q').remove('q')
+            .remove('R').remove('r')
+            .remove('S').remove('s')
+            .remove('T').remove('t')
+            .remove('U').remove('u')
+            .remove('V').remove('v')
+            .remove('W').remove('w')
+            .remove('X').remove('x')
+            .remove('Y').remove('y')
+            .remove('Z').remove('z')
+            ;
+    return strOutput;
+}
