@@ -83,11 +83,13 @@ private slots:
     void on_actionShow_total_time_triggered(bool checked);
 
 
-    void on_fontComboBox_activated(const QString &arg1);
+    void on_fontComboBox_activated();
     void on_fontSize_spinBox_valueChanged(int arg1);
 
     void on_pushButton_clicked();//Track Time
     void on_ignoreButton_clicked();
+
+
 
 private:
     Ui::MainWindow *ui;
@@ -120,6 +122,7 @@ private:
     void readInTrackedTime(QString &strInFile);
     void readInIgnoredTime(QString &strInFile);
     QString readInLastSavedTime(QString &strInFile);
+    void removeLastMarker(QString strLastMarkerToRemove);
     int stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime);
     void logMissingTime();
     void removeLastTimeEntry();

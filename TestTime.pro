@@ -19,6 +19,7 @@ SOURCES += main.cpp\
     filterutilitydialog.cpp \
     inserttimedialog.cpp \
     C://Users/thema/OneDrive/Documents/Matts_Software/General_Library/mattcalculations.cpp \
+    aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
     loadfiledialog.h \
@@ -26,12 +27,14 @@ HEADERS  += mainwindow.h \
     filterutilitydialog.h \
     inserttimedialog.h \
     C://Users/thema/OneDrive/Documents/Matts_Software/General_Library/mattcalculations.h \
+    aboutdialog.h
 
 FORMS    += mainwindow.ui \
     loadfiledialog.ui \
     changelogtitledialog.ui \
     filterutilitydialog.ui \
-    inserttimedialog.ui
+    inserttimedialog.ui \
+    aboutdialog.ui
 
 RESOURCES += \
     images.qrc

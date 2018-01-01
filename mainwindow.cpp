@@ -376,32 +376,56 @@ void MainWindow::on_actionShow_current_task_counter_triggered(bool checked)
 
 void MainWindow::on_actionUndo_last_log_entry_triggered()
 {
+    QString strTemp;
+    QString strCurrentText = ui->textEdit->toPlainText();
+    QString strLastSavedTime = readInLastSavedTime(strCurrentText);
+
+    QTime tTemp =    QTime::fromString(strLastSavedTime,"h:mm:ss AP" );//==========================================================
+    removeLastTimeEntry();
+
+    ui->textEdit->append("-> Time Swapped <-");
+
     if(m_nPreviousLogType == TRACK)
     {
-        m_nTotalTrackedTime = m_nTotalTrackedTime - m_nElapsed;
-        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime));
-        m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
-        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
-        QString out;
-        out = "==> "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
-        ui->textEdit->append(out);
-        ui->textEdit->append("  from Tracked to"); //Ignored");
-        ui->textEdit->append(IGNORE_MARKER);
+//        m_nTotalTrackedTime = m_nTotalTrackedTime - m_nElapsed;
+//        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime));
+//        m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
+//        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
+//        QString out;
+//        out = "==> "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
+//        ui->textEdit->append(out);
+//        ui->textEdit->append("  from Tracked to"); //Ignored");
+//        ui->textEdit->append(IGNORE_MARKER);
         m_nPreviousLogType = IGNORE;
-
+        insertTime(tTemp,IGNORE,IGNORE);
     }
     else
     {
-        m_nTotalTrackedTime = m_nTotalTrackedTime + m_nElapsed;
-        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime));
-        m_nTotalIgnoredTime = m_nTotalIgnoredTime - m_nElapsed;
-        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
-        QString out;
-        out = "<== "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
-        ui->textEdit->append(out);
-        ui->textEdit->append("  from Ignored to Tracked");
+//        m_nTotalTrackedTime = m_nTotalTrackedTime + m_nElapsed;
+//        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime));
+//        m_nTotalIgnoredTime = m_nTotalIgnoredTime - m_nElapsed;
+//        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
+//        QString out;
+//        out = "<== "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
+//        ui->textEdit->append(out);
+//        ui->textEdit->append("  from Ignored to Tracked");
         m_nPreviousLogType = TRACK;
+        insertTime(tTemp,TRACK,TRACK);
     }
+    removeLastMarker(INSERT_MARKER );
+    //ui->textEdit->append("\n");
+    //ui->textEdit->append("Swapped");
+}
+void MainWindow::removeLastMarker(QString strLastMarkerToRemove)
+{
+    QString strTemp;
+    strTemp = ui->textEdit->toPlainText();
+    int nStartIndex = strTemp.lastIndexOf(strLastMarkerToRemove);
+    int nLengthOfMarker = strLastMarkerToRemove.length();
+    //for(int iii = startIndex; iii <= (startIndex+nLengthOfMarker);iii++)
+    strTemp.remove(nStartIndex,nLengthOfMarker);
+    ui->textEdit->setText(strTemp);
+    refreshTextEdit();
 }
 
 void MainWindow::on_actionShow_Time_Ignored_triggered(bool checked)
@@ -479,6 +503,7 @@ void MainWindow::exitWithoutSave()
 void MainWindow::on_actionUndo_last_time_logging_triggered()
 {
     removeLastTimeEntry();
+    refreshTextEdit();
 }
 
 QString MainWindow::getIgnoredText()
@@ -742,6 +767,7 @@ void MainWindow::on_actionInsert_time_break_triggered()
 {
     InsertTimeDialog *InsertTime = new InsertTimeDialog(this);
     InsertTime->exec();
+    refreshTextEdit();
 }
 
 int MainWindow::findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime)
@@ -922,7 +948,7 @@ void MainWindow::refreshTextEdit()
 
 }
 
-void MainWindow::on_fontComboBox_activated(const QString &arg1)
+void MainWindow::on_fontComboBox_activated()
 {
     refreshTextEdit();
 }
