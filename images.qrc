@@ -1,6 +1,3 @@
 <RCC>
-    <qresource prefix="/">
-        <file>stopwatch.ico</file>
-        <file>Stopwatch.jpg</file>
-    </qresource>
+    <qresource prefix="/"/>
 </RCC>

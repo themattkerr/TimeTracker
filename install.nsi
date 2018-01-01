@@ -2,7 +2,7 @@
 !define PRODUCT_NAME "TimeTracKerr"
 !define PRODUCT_PUBLISHER "Matt"
 !define PRODUCT_WEB_SITE "MoveMode.com"
-!define PRODUCT_VERSION "1.1.0"
+!define PRODUCT_VERSION "1.1.1_Beta_Build_2"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\TestTime.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -22,7 +22,7 @@
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "stopwatch.ico"
+!define MUI_ICON "StopwatchBG.ico"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 
 Name "${PRODUCT_NAME}"

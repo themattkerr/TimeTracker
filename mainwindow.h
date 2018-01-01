@@ -1,8 +1,25 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include <QTime>
+
 #include <QMainWindow>
+
+#include "C://Users/thema/OneDrive/Documents/Matts_Software/General_Library/mattcalculations.h"
+#include "loadfiledialog.h"
+#include "changelogtitledialog.h"
+#include "filterutilitydialog.h"
+#include "inserttimedialog.h"
+
+#include <QDateTime>
+#include <QTime>
+#include <QTimer>
+
+#include <QString>
+#include <qdebug.h>
 #include <QTextStream>
+#include <qtextcursor.h>
+
+#include <QDir>
+#include <QFile>
 
 #define SECTION_BREAK "----------------------------------- "
 #define PROGRAM_EXIT_BREAK "===================== "
@@ -47,33 +64,30 @@ public:
     bool getExitNow();
 
 private slots:
-    void on_pushButton_clicked();
 
+    void on_actionLoad_saved_log_triggered();//May not actually be used?
     void displayEllapsed();
 
-    void on_ignoreButton_clicked();
-
-    void on_actionShow_current_task_counter_triggered(bool checked);
-
-    void on_actionUndo_last_log_entry_triggered();
-
-    void on_actionShow_Time_Ignored_triggered(bool checked);
-
+    // File Menu ---
     void on_actionChange_log_title_triggered();
-
-    void on_actionLoad_saved_log_triggered();
-
-    void on_actionShow_total_time_triggered(bool checked);
-
-    void on_actionUndo_last_time_logging_triggered();
-
     void on_actionFilter_Utility_triggered();
 
+    //Edit Menu ---
+    void on_actionUndo_last_log_entry_triggered();//This is actually Swap Tracked and Ignored
+    void on_actionUndo_last_time_logging_triggered();
     void on_actionInsert_time_break_triggered();
 
-    void on_fontSize_spinBox_valueChanged(int arg1);
+    //Options Menu ---
+    void on_actionShow_current_task_counter_triggered(bool checked);
+    void on_actionShow_Time_Ignored_triggered(bool checked);
+    void on_actionShow_total_time_triggered(bool checked);
+
 
     void on_fontComboBox_activated(const QString &arg1);
+    void on_fontSize_spinBox_valueChanged(int arg1);
+
+    void on_pushButton_clicked();//Track Time
+    void on_ignoreButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -115,6 +129,7 @@ private:
     QString scanForTitle(QString strInput);
     QString getFileName ();
     QString makeNewFileName(QString strFileName);
+
     QString findInsertSection(QString &strCurrentText, QTime &tInsertTime , int &nBeforeTime, int &nAfterTime, int &nStartIndex, int &nEndIndex);
     int findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime);
     void     setAndRemoveTimesForInsertTime(QTime &tInsertTime, QString &strCurrentText,

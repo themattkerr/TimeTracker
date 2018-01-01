@@ -1,23 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "calculations.h"
-#include "loadfiledialog.h"
-#include "changelogtitledialog.h"
-#include "filterutilitydialog.h"
-#include "inserttimedialog.h"
+//#include "calculations.h"
 
-#include <QDateTime>
-#include <QTime>
-#include <QTimer>
-
-#include <QString>
-#include <qdebug.h>
-#include <QTextStream>
-#include <qtextcursor.h>
-
-#include <QDir>
-#include <QFile>
 
 #include <QMessageBox>
 

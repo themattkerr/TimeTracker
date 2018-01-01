@@ -14,7 +14,7 @@
    <string>Time TracKerr</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="images.qrc">
+   <iconset>
     <normaloff>:/stopwatch.ico</normaloff>:/stopwatch.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -26,12 +26,18 @@
         <property name="text">
          <string>Current Task:</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="CurrentTaskTime">
         <property name="text">
          <string>---</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -47,6 +53,9 @@
         <property name="text">
          <string>Time Tracked:</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
       </item>
       <item>
@@ -56,6 +65,9 @@
         </property>
         <property name="text">
          <string>---</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -71,12 +83,18 @@
         <property name="text">
          <string>Time Ignored:</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="timeIgnored">
         <property name="text">
          <string>---</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -92,6 +110,9 @@
         <property name="text">
          <string>Total Time:</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
       </item>
       <item>
@@ -101,6 +122,9 @@
         </property>
         <property name="text">
          <string>---</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -285,9 +309,7 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>fontComboBox</sender>

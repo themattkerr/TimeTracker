@@ -5,9 +5,7 @@
 #include <qstring.h>
 #endif
 
-enum curency{
-    US_DOLLARS = 0,
-};
+
 
 bool doubleIsEqual (double x, double y, unsigned int nNumberOfDecimalPlaces);
 
