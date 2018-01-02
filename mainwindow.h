@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 2"
+
 #include <QMainWindow>
 
 #include "C://Users/thema/OneDrive/Documents/Matts_Software/General_Library/mattcalculations.h"
@@ -8,6 +10,7 @@
 #include "changelogtitledialog.h"
 #include "filterutilitydialog.h"
 #include "inserttimedialog.h"
+#include "aboutdialog.h"
 
 #include <QDateTime>
 #include <QTime>
@@ -63,6 +66,8 @@ public:
     int getIgnoredTime();
     bool getExitNow();
 
+    void setPrivousLogType(int nPreviousLogType);
+
 private slots:
 
     void on_actionLoad_saved_log_triggered();//May not actually be used?
@@ -90,6 +95,8 @@ private slots:
     void on_ignoreButton_clicked();
 
 
+
+    void on_actionAbout_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -142,5 +149,6 @@ private:
                                             QString &strSavedTime, int &nStoredAs, int &nAmountTimeSavedInSection, QString &strSectionText);
 
 };
+
 
 #endif // MAINWINDOW_H

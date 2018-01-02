@@ -380,52 +380,40 @@ void MainWindow::on_actionUndo_last_log_entry_triggered()
     QString strCurrentText = ui->textEdit->toPlainText();
     QString strLastSavedTime = readInLastSavedTime(strCurrentText);
 
-    QTime tTemp =    QTime::fromString(strLastSavedTime,"h:mm:ss AP" );//==========================================================
-    removeLastTimeEntry();
-
-    ui->textEdit->append("-> Time Swapped <-");
-
-    if(m_nPreviousLogType == TRACK)
+    QTime tTemp =    QTime::fromString(strLastSavedTime,"h:mm:ss AP" );
+    if(tTemp.isValid() && (m_nPreviousLogType == TRACK || m_nPreviousLogType == IGNORE))
     {
-//        m_nTotalTrackedTime = m_nTotalTrackedTime - m_nElapsed;
-//        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime));
-//        m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
-//        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
-//        QString out;
-//        out = "==> "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
-//        ui->textEdit->append(out);
-//        ui->textEdit->append("  from Tracked to"); //Ignored");
-//        ui->textEdit->append(IGNORE_MARKER);
-        m_nPreviousLogType = IGNORE;
-        insertTime(tTemp,IGNORE,IGNORE);
+        removeLastTimeEntry();
+
+        ui->textEdit->append("-> Time Swapped <-");
+
+        if(m_nPreviousLogType == TRACK)
+        {
+            insertTime(tTemp,IGNORE,IGNORE);
+            removeLastMarker(INSERT_MARKER );
+            m_nPreviousLogType = IGNORE;
+        }
+        else if(m_nPreviousLogType == IGNORE)
+        {
+            insertTime(tTemp,TRACK,TRACK);
+            removeLastMarker(INSERT_MARKER );
+            m_nPreviousLogType = TRACK;
+        }
     }
-    else
-    {
-//        m_nTotalTrackedTime = m_nTotalTrackedTime + m_nElapsed;
-//        ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime));
-//        m_nTotalIgnoredTime = m_nTotalIgnoredTime - m_nElapsed;
-//        ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime));
-//        QString out;
-//        out = "<== "; out.append(millisecondsToHoursMinsSec(m_nElapsed)).append(" swapped");
-//        ui->textEdit->append(out);
-//        ui->textEdit->append("  from Ignored to Tracked");
-        m_nPreviousLogType = TRACK;
-        insertTime(tTemp,TRACK,TRACK);
-    }
-    removeLastMarker(INSERT_MARKER );
-    //ui->textEdit->append("\n");
-    //ui->textEdit->append("Swapped");
 }
+
 void MainWindow::removeLastMarker(QString strLastMarkerToRemove)
 {
     QString strTemp;
     strTemp = ui->textEdit->toPlainText();
     int nStartIndex = strTemp.lastIndexOf(strLastMarkerToRemove);
-    int nLengthOfMarker = strLastMarkerToRemove.length();
-    //for(int iii = startIndex; iii <= (startIndex+nLengthOfMarker);iii++)
-    strTemp.remove(nStartIndex,nLengthOfMarker);
-    ui->textEdit->setText(strTemp);
-    refreshTextEdit();
+    if(nStartIndex >= 0)
+    {
+        int nLengthOfMarker = strLastMarkerToRemove.length();
+        strTemp.remove(nStartIndex,nLengthOfMarker);
+        ui->textEdit->setText(strTemp);
+        refreshTextEdit();
+    }
 }
 
 void MainWindow::on_actionShow_Time_Ignored_triggered(bool checked)
@@ -597,7 +585,7 @@ void MainWindow::removeLastTimeEntry()
 
     for (int iii = nLastTime+2; iii >=0; iii-- )
     {
-        if(strCurrentText[iii] != '\n')
+        if(strCurrentText[iii] != '\n' && strCurrentText[iii] != ' ')
             strTempTimeReversed.append(strCurrentText[iii]);
         else
             break;
@@ -951,4 +939,17 @@ void MainWindow::refreshTextEdit()
 void MainWindow::on_fontComboBox_activated()
 {
     refreshTextEdit();
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutDialog *x = new AboutDialog(this);
+    x->exec();
+    x=0;
+    delete x;
+}
+void MainWindow::setPrivousLogType(int nPreviousLogType)
+{
+    if( nPreviousLogType == TRACK || nPreviousLogType == IGNORE  )
+        m_nPreviousLogType = nPreviousLogType;
 }

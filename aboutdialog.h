@@ -2,6 +2,8 @@
 #define ABOUTDIALOG_H
 
 #include <QDialog>
+#include "C://Users/thema/OneDrive/Documents/Matts_Software/General_Library/mattcalculations.h"
+#include "mainwindow.h"
 
 namespace Ui {
 class AboutDialog;

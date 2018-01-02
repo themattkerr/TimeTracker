@@ -238,9 +238,16 @@
     <addaction name="actionUndo_last_time_logging"/>
     <addaction name="actionInsert_time_break"/>
    </widget>
+   <widget class="QMenu" name="menuInfo">
+    <property name="title">
+     <string>Info</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuOptions"/>
    <addaction name="menuUndo"/>
    <addaction name="menuOptions_2"/>
+   <addaction name="menuInfo"/>
   </widget>
   <action name="actionShow_current_task_counter">
    <property name="checkable">
@@ -305,6 +312,11 @@
   <action name="actionInsert_time_break">
    <property name="text">
     <string>Insert time break</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

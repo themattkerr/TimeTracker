@@ -59,6 +59,7 @@ void LoadFileDialog::on_continueButton_clicked()
 bool LoadFileDialog::LoadFileInfo(int nLoadFileInfo)
 {
     ((MainWindow*)parentWidget())->SetLoadFileInfo(nLoadFileInfo);
+    ((MainWindow*)parentWidget())->setPrivousLogType(nLoadFileInfo);
 }
 
 void LoadFileDialog::on_logTimeCheckBox_toggled(bool checked)
