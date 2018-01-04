@@ -38,6 +38,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     t.start();
+
+    if(m_nLoadFileInfo == EXIT_NO_SAVE)
+    {
+        m_bExitNow = true;
+        hideAllInfo();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -47,6 +53,24 @@ MainWindow::~MainWindow()
     if(m_nLoadFileInfo != EXIT_NO_SAVE)
         saveLog(m_strFileName);
     delete ui;
+}
+void MainWindow::hideAllInfo()
+{
+    on_actionShow_current_task_counter_triggered(false);
+    on_actionShow_Time_Ignored_triggered(false);
+    on_actionShow_total_time_triggered(false);
+
+    ui->menuBar->hide();
+    ui->pushButton->hide();
+    ui->ignoreButton->hide();
+    ui->textEdit->hide();
+    ui->totalTime->hide();
+    ui->TrackedTimeLabel->hide();
+    ui->TotalTrackedTime->hide();
+    ui->fontComboBox->hide();
+    ui->fontSize_spinBox->hide();
+    ui->centralWidget->hide();
+    adjustSize();
 }
 
 bool MainWindow::getExitNow()
@@ -106,13 +130,15 @@ void MainWindow::on_pushButton_clicked()
     calculateTotalTime();
     m_nPreviousLogType = TRACK;
     ui->textEdit->setFocus();
-
+    refreshTextEdit();
     t.restart();
 }
 
 void MainWindow::displayEllapsed()
 {
     ui->CurrentTaskTime->setText(millisecondsToHoursMinsSec(t.elapsed()+ m_nDeletedTime));
+    if(m_bExitNow == true)
+        this->close();
 }
 
 void MainWindow::on_ignoreButton_clicked()
@@ -131,6 +157,7 @@ void MainWindow::on_ignoreButton_clicked()
     m_nPreviousLogType = IGNORE;
 
     ui->textEdit->setFocus();
+    refreshTextEdit();
     t.restart();
 }
 
@@ -227,6 +254,10 @@ void MainWindow::SetLoadFileInfo(int nLoadFileInfo )
 {
    m_nLoadFileInfo = nLoadFileInfo;
 }
+ int MainWindow::getLoadFileInfo()
+ {
+     return m_nLoadFileInfo;
+ }
 
 void MainWindow::setupLog()
 {
@@ -344,19 +375,19 @@ void MainWindow::logMissingTime()
     }
     else
     {
-        QString strMissingTime = "Missing time:  ";
+        QString strMissingTime = MISSING_TIME_MARKER;
         strMissingTime.append(millisecondsToHoursMinsSec(nTimeDifference));
         ui->textEdit->append(strMissingTime);
     }
     if (m_nLoadFileInfo == TRACK)
     {
         m_nTotalTrackedTime += nTimeDifference;
-        ui->textEdit->append("Time has been logged as Tracked.");
+        ui->textEdit->append(LOGGED_AS_TRACKED_MARKER);
     }
     if (m_nLoadFileInfo == IGNORE)
     {
         m_nTotalIgnoredTime += nTimeDifference;
-        ui->textEdit->append("Time as been logged as > Ignored <.");
+        ui->textEdit->append(LOGGED_AS_IGNORED_MARKER);
     }
 }
 
@@ -440,6 +471,7 @@ void MainWindow::SetLogTitle(QString LogTitle)
 {
     m_strLogTitle = LogTitle;
     this->setWindowTitle(m_strLogTitle);
+    m_strFileName = getFileName();
 }
 
 QString MainWindow::getLogTitle()
@@ -817,14 +849,36 @@ void MainWindow::setAndRemoveTimesForInsertTime(
                                         int &nAmountTimeSavedInSection,
                                         QString &strSectionText
                                         )
+    /*
+     *
+     */
     {
         QString strInsertText = "";
         int nInsertLocation = 0;
 
+        if(strSectionText.contains(MISSING_TIME_MARKER))
+        {
+            QString strTemp = MISSING_TIME_MARKER;
+            int nIndexOfTextToRemove = strCurrentText.indexOf(MISSING_TIME_MARKER, nStartIndex);
+            strCurrentText.remove((nIndexOfTextToRemove), strTemp.length());
+        }
+        if(strSectionText.contains(LOGGED_AS_TRACKED_MARKER))
+        {
+            QString strTemp = LOGGED_AS_TRACKED_MARKER;
+            int nIndexOfTextToRemove = strCurrentText.indexOf(LOGGED_AS_TRACKED_MARKER, nStartIndex);
+            strCurrentText.remove((nIndexOfTextToRemove), strTemp.length()+1);//+1 to get rid of \n
+        }
+        if(strSectionText.contains(LOGGED_AS_IGNORED_MARKER))
+        {
+            QString strTemp = LOGGED_AS_IGNORED_MARKER;
+            int nIndexOfTextToRemove = strCurrentText.indexOf(LOGGED_AS_IGNORED_MARKER, nStartIndex);
+            strCurrentText.remove((nIndexOfTextToRemove), strTemp.length()+1);//+1 to get rid of \n
+        }
         if (strSectionText.contains(IGNORE_MARKER))
         {
             QString strTemp = IGNORE_MARKER;
-            strCurrentText.remove((nStartIndex + strSectionText.indexOf(IGNORE_MARKER)), strTemp.length());
+            int nIndexOfTextToRemove = strCurrentText.indexOf(IGNORE_MARKER, nStartIndex);
+            strCurrentText.remove((nIndexOfTextToRemove), strTemp.length()+1);//+1 to get rid of \n
         }
         if (strSectionText != ADD_TO_BEGINING || strSectionText != ADD_TO_END || strSectionText != ONLY_INSERTED_TIME)//<======
         {
@@ -850,7 +904,7 @@ void MainWindow::setAndRemoveTimesForInsertTime(
         if (strSectionText.contains(PROGRAM_EXIT_BREAK))
         {
             QString strTemp = PROGRAM_EXIT_BREAK;
-            nInsertLocation += strSectionText.indexOf(PROGRAM_EXIT_BREAK);
+            nInsertLocation = strCurrentText.indexOf(PROGRAM_EXIT_BREAK,nStartIndex);
             nInsertLocation += strTemp.length();
         }
         if (nStoredAs == TRACK)
@@ -908,7 +962,7 @@ void MainWindow::setAndRemoveTimesForInsertTime(
         }
         if (nLogAfterAs == APPEND)
         {
-
+            //Do Nothing
         }
 
         strCurrentText.insert(nInsertLocation, strInsertText);

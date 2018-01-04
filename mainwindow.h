@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 2"
+#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 3"
 
 #include <QMainWindow>
 
@@ -31,6 +31,9 @@
 #define ADD_TO_BEGINING "Add to begining"
 #define ADD_TO_END "Add to end"
 #define ONLY_INSERTED_TIME "No other time found"
+#define MISSING_TIME_MARKER "Missing time:  "
+#define LOGGED_AS_TRACKED_MARKER "Time has been logged as Tracked."
+#define LOGGED_AS_IGNORED_MARKER "Time as been logged as > Ignored <."
 
 enum LoadFileInfo{
     STARTNEW = 0,
@@ -62,6 +65,7 @@ public:
     QString getLogTitle();
     QString getIgnoredText();
     QString getTrackedText();
+    int getLoadFileInfo();
     int getTrackedTime();
     int getIgnoredTime();
     bool getExitNow();
@@ -121,6 +125,7 @@ private:
     int m_nPreviousLogType;
     int m_nElapsed;
 
+    void hideAllInfo();
     void initializeMemberVariables();
     void initializeGUI();
     void calculateTotalTime();
