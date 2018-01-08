@@ -2,7 +2,7 @@
 !define PRODUCT_NAME "TimeTracKerr"
 !define PRODUCT_PUBLISHER "Matt"
 !define PRODUCT_WEB_SITE "MoveMode.com"
-!define PRODUCT_VERSION "1.1.1_Beta_Build_3"
+!define PRODUCT_VERSION "1.1.1_Beta_Build_4"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\TestTime.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"

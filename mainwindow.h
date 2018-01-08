@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 3"
+#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 4"
 
 #include <QMainWindow>
 
@@ -26,14 +26,14 @@
 
 #define SECTION_BREAK "----------------------------------- "
 #define PROGRAM_EXIT_BREAK "===================== "
-#define IGNORE_MARKER "> Ignored <"
-#define INSERT_MARKER "+++ Time inserted +++\n"
+#define IGNORE_MARKER " > Ignored < "
+#define INSERT_MARKER " +++ Time inserted +++ \n"
 #define ADD_TO_BEGINING "Add to begining"
 #define ADD_TO_END "Add to end"
 #define ONLY_INSERTED_TIME "No other time found"
 #define MISSING_TIME_MARKER "Missing time:  "
 #define LOGGED_AS_TRACKED_MARKER "Time has been logged as Tracked."
-#define LOGGED_AS_IGNORED_MARKER "Time as been logged as > Ignored <."
+#define LOGGED_AS_IGNORED_MARKER "Time as been logged as > Ignored <. "
 
 enum LoadFileInfo{
     STARTNEW = 0,
@@ -67,7 +67,7 @@ public:
     QString getTrackedText();
     int getLoadFileInfo();
     int getTrackedTime();
-    int getIgnoredTime();
+   int getIgnoredTime();
     bool getExitNow();
 
     void setPrivousLogType(int nPreviousLogType);
@@ -102,6 +102,10 @@ private slots:
 
     void on_actionAbout_triggered();
 
+    void on_textEdit_cursorPositionChanged();
+
+    void on_textEdit_textChanged();
+
 private:
     Ui::MainWindow *ui;
 
@@ -135,7 +139,9 @@ private:
     void readInIgnoredTime(QString &strInFile);
     QString readInLastSavedTime(QString &strInFile);
     void removeLastMarker(QString strLastMarkerToRemove);
+
     int stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime);
+    int stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime, bool &bSectionContainsSavedTime);
     void logMissingTime();
     void removeLastTimeEntry();
     void refreshTimeTotals();
@@ -153,6 +159,12 @@ private:
                                             int &nIndexOfTimeStoredInSection,
                                             QString &strSavedTime, int &nStoredAs, int &nAmountTimeSavedInSection, QString &strSectionText);
 
+    int findStartIndexOfWord(int nPosition, QString strInput);
+    bool lineHasBreak(QString strInput);
+    QString getLineString(int nLineStartIndex, QString strInput);
+    bool lineHasTimeStamp(QString strStringToTest, int &nStartIndex, int &nLength);
+    void placeTextEditCursor(int nPlacement);
+    bool stringHasSavedTime(QString strStringToTest, int &nStartIndex);
 };
 
 

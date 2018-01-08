@@ -5,6 +5,7 @@
 
 
 #include <QMessageBox>
+//#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -111,8 +112,8 @@ void MainWindow::initializeGUI()
     ui->totalTime->hide();
 
     ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
-
+    ui->textEdit->append (t.currentTime().toString("h:mm:ss A" )+" ");
+     //ui->textEdit->append ("\n");
     ui->fontSize_spinBox->setValue(12);
 
 }
@@ -125,7 +126,8 @@ void MainWindow::on_pushButton_clicked()
 
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
     ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
+    ui->textEdit->append (t.currentTime().toString("h:mm:ss A ")+"\n");
+    //ui->textEdit->append(" \n");// <= Must do this to prevent combining entered lines and time +++++++++
     ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime)  );
     calculateTotalTime();
     m_nPreviousLogType = TRACK;
@@ -150,7 +152,7 @@ void MainWindow::on_ignoreButton_clicked()
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
     ui->textEdit->append(IGNORE_MARKER);
     ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
+    ui->textEdit->append (t.currentTime().toString("h:mm:ss A")+"\n");
 
     ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime)  );
     calculateTotalTime();
@@ -665,15 +667,48 @@ void MainWindow::refreshTimeTotals()
 
 }
 
+bool MainWindow::stringHasSavedTime(QString strStringToTest, int &nStartIndex)
+{
+    nStartIndex = -1;
+    nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890][1234567890]h:[1234567890][1234567890]m:[1234567890][1234567890]s"));
+
+    if(nStartIndex < 0)
+    nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890]h:[1234567890][1234567890]m:[1234567890][1234567890]s"));
+
+    if(nStartIndex < 0)
+    nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890][1234567890]m:[1234567890][1234567890]s"));
+    if(nStartIndex < 0)
+    nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
+
+    if(nStartIndex >= 0)
+        return true;
+    else
+        return false;
+}
+
 int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime)
+{
+    bool bTemp;
+    return stringWithTimeEnteredToMilliseconds( strStringWithSavedTime, strSavedTime, bTemp);
+}
+
+int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTime, QString &strSavedTime, bool &bSectionContainsSavedTime)
 {
     QString strTempTimeReversed = "";
     int nLastTime = strStringWithSavedTime.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
     if (nLastTime < 0)
+    {
+        bSectionContainsSavedTime = false;
         return -1;
+    }
     for (int iii = nLastTime+2; iii >=0; iii-- )
     {
+//        QChar chToTest; chToTest = strStringWithSavedTime[iii];
         if(strStringWithSavedTime[iii] != '\n' && strStringWithSavedTime[iii] != ' ')
+//                &&
+//                ( !isALetter( strStringWithSavedTime[iii])
+//                  && (strStringWithSavedTime[iii] == 'h' || strStringWithSavedTime[iii] == 'm' || strStringWithSavedTime[iii] == "s"))
+//                ))
             strTempTimeReversed.append(strStringWithSavedTime[iii]);
         else
             break;
@@ -686,7 +721,18 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
 
     strSavedTime = strTemp;
 
-    return stringToMilliseconds(strTemp);
+    int nTemp = stringToMilliseconds(strTemp);
+    if(nTemp < 0)
+    {
+        bSectionContainsSavedTime = false;
+        return -1;
+    }
+    else
+    {
+        bSectionContainsSavedTime = true;
+        return nTemp;
+    }
+
 }
 
 QString MainWindow::findInsertSection(QString &strCurrentText, QTime &tInsertTime, int &nBeforeTime, int &nAfterTime ,int &nStartIndex, int &nEndIndex)
@@ -1006,4 +1052,160 @@ void MainWindow::setPrivousLogType(int nPreviousLogType)
 {
     if( nPreviousLogType == TRACK || nPreviousLogType == IGNORE  )
         m_nPreviousLogType = nPreviousLogType;
+}
+
+void MainWindow::on_textEdit_cursorPositionChanged()
+{
+   QString strCurrentText = ui->textEdit->toPlainText();
+
+   qDebug() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+   int nPosition = ui->textEdit->textCursor().position();
+
+   int nStartIndex = findStartIndexOfWord(nPosition, strCurrentText);
+   qDebug() << "Current postition of Cursor: " << nPosition;
+   qDebug() << "Line Start: " << nStartIndex;
+
+   QString strLine = getLineString(nStartIndex, strCurrentText );
+   qDebug() << "line: " << strLine;
+
+   bool bLineHasBreak = lineHasBreak(strLine);
+   qDebug() <<"Has Break: "<< bLineHasBreak;
+
+   int nIndexOfSavedTimeLine;
+   bool bStringHasSavedTime = stringHasSavedTime(strLine,nIndexOfSavedTimeLine);
+   qDebug() << "Has Saved Time: " << bStringHasSavedTime;
+
+   int nLineTimeStampStartIndex = 0; int nLineTimeStampLength = 0;
+   bool bLineHasTimeStamp = lineHasTimeStamp(strLine, nLineTimeStampStartIndex,nLineTimeStampLength);
+   qDebug() << "Has a Time Stamp: " << bLineHasTimeStamp;
+
+   QString strNextLine;
+   int nNextLineStartIndex = nStartIndex + strLine.length();
+   if(nNextLineStartIndex < strCurrentText.length() )
+        strNextLine = getLineString(nNextLineStartIndex, strCurrentText);
+   qDebug() << "Next Line: " << strNextLine;
+
+   int nSavedTimeIndexNextLine;
+   bool bNextLineHasSavedTime = stringHasSavedTime(strNextLine,nSavedTimeIndexNextLine);
+
+    if(bLineHasTimeStamp && strNextLine == "")
+    {
+        strCurrentText.append('\n');
+        ui->textEdit->setText(strCurrentText);
+        refreshTextEdit();
+    }
+    if(bLineHasTimeStamp && nLineTimeStampLength < strLine.length() && strLine[nLineTimeStampLength+1] != '\n' )
+    {
+        strCurrentText.insert((nStartIndex + nLineTimeStampLength)," \n");
+        ui->textEdit->setText(strCurrentText);
+        placeTextEditCursor(nNextLineStartIndex);
+        return;
+    }
+   if((bNextLineHasSavedTime && bLineHasTimeStamp) || (bLineHasBreak && bNextLineHasSavedTime) )
+   {
+        strCurrentText.insert(nNextLineStartIndex, '\n');
+        ui->textEdit->setText(strCurrentText);
+        placeTextEditCursor(nNextLineStartIndex);
+        return;
+   }
+
+
+   if(bLineHasBreak || bLineHasTimeStamp)
+       placeTextEditCursor(nNextLineStartIndex);
+
+    if(bStringHasSavedTime || strLine.contains(IGNORE_MARKER))
+    {
+        if( nIndexOfSavedTimeLine > 0)
+        {
+            strCurrentText.insert((nStartIndex+nIndexOfSavedTimeLine), '\n');
+            ui->textEdit->setText(strCurrentText);
+            placeTextEditCursor(nNextLineStartIndex-1);
+        }
+        else
+        placeTextEditCursor(nStartIndex-1);
+    }
+
+
+}
+void MainWindow::placeTextEditCursor(int nPlacement)
+{
+    QTextCursor tmpCursor = ui->textEdit->textCursor();
+    tmpCursor.movePosition(QTextCursor::Start,QTextCursor::MoveAnchor);
+    tmpCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, nPlacement);
+    ui->textEdit->setTextCursor(tmpCursor);
+}
+
+int MainWindow::findStartIndexOfWord(int nPosition, QString strInput)
+{
+    int nIndex = nPosition;
+    while (nIndex > 0)
+    {
+        nIndex --;
+        if(strInput.at(nIndex) == '\n')
+            return nIndex + 1;
+//        if(strInput.at(nIndex) == ' '|| nIndex == 0)
+        if(nIndex == 0)
+            break;
+
+    }
+    return (nIndex);
+}
+
+QString MainWindow::getLineString(int nLineStartIndex, QString strInput)
+{
+    QString strLine;
+    int nCurrentIndex = nLineStartIndex;
+    while(nCurrentIndex < strInput.length())
+    {
+        strLine.append(strInput.at(nCurrentIndex));
+        if(strInput.at(nCurrentIndex ) == '\n')
+            break;
+        nCurrentIndex++;
+    }
+    return strLine;
+}
+
+bool MainWindow::lineHasBreak( QString strInput)
+{
+    QString *x = &strInput;
+
+    if(
+        x->contains(SECTION_BREAK) ||
+        x->contains(PROGRAM_EXIT_BREAK )||
+        //x->contains(IGNORE_MARKER) ||
+        x->contains(INSERT_MARKER) ||
+        x->contains(MISSING_TIME_MARKER) ||
+        x->contains(LOGGED_AS_TRACKED_MARKER) ||
+        x->contains(LOGGED_AS_IGNORED_MARKER)
+            )
+        return true;
+    else
+        return false;
+}
+
+void MainWindow::on_textEdit_textChanged()
+{
+    on_textEdit_cursorPositionChanged();
+}
+bool MainWindow::lineHasTimeStamp(QString strStringToTest,int &nStartIndex ,int &nLength)
+{
+    nStartIndex = -1;
+    nLength = -1;
+    nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890][1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"));
+    if(nStartIndex >=0)
+    {
+        nLength = 12;
+        return true;
+    }
+    if(nStartIndex < 0)
+    {
+        nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"));
+        if(nStartIndex >= 0)
+        {
+            nLength = 11;
+            return true;
+        }
+    }
+    return false;
+
 }
