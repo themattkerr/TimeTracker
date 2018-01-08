@@ -112,7 +112,7 @@ void MainWindow::initializeGUI()
     ui->totalTime->hide();
 
     ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A" )+" ");
+    ui->textEdit->append (t.currentTime().toString("h:mm:ss A" ));
      //ui->textEdit->append ("\n");
     ui->fontSize_spinBox->setValue(12);
 
@@ -126,8 +126,7 @@ void MainWindow::on_pushButton_clicked()
 
     ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
     ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A ")+"\n");
-    //ui->textEdit->append(" \n");// <= Must do this to prevent combining entered lines and time +++++++++
+    ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
     ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime)  );
     calculateTotalTime();
     m_nPreviousLogType = TRACK;
@@ -1088,19 +1087,25 @@ void MainWindow::on_textEdit_cursorPositionChanged()
    int nSavedTimeIndexNextLine;
    bool bNextLineHasSavedTime = stringHasSavedTime(strNextLine,nSavedTimeIndexNextLine);
 
-    if(bLineHasTimeStamp && strNextLine == "")
+
+   if(bLineHasTimeStamp && strNextLine == "")
     {
-        strCurrentText.append('\n');
-        ui->textEdit->setText(strCurrentText);
-        refreshTextEdit();
+        if(nNextLineStartIndex >0)
+            if(strCurrentText[nNextLineStartIndex-1] != '\n')
+            {
+                strCurrentText.append('\n');
+                ui->textEdit->setText(strCurrentText);
+                placeTextEditCursor(nNextLineStartIndex+1);
+                return;
+            }
     }
-    if(bLineHasTimeStamp && nLineTimeStampLength < strLine.length() && strLine[nLineTimeStampLength+1] != '\n' )
-    {
-        strCurrentText.insert((nStartIndex + nLineTimeStampLength)," \n");
-        ui->textEdit->setText(strCurrentText);
-        placeTextEditCursor(nNextLineStartIndex);
-        return;
-    }
+   if(bLineHasTimeStamp && nLineTimeStampLength < strLine.length() && strLine[nLineTimeStampLength+1] != '\n' ) // <===== Debug this
+   {
+       strCurrentText.insert((nStartIndex + nLineTimeStampLength)," \n");
+       ui->textEdit->setText(strCurrentText);
+       placeTextEditCursor(nStartIndex);//removed nNextLineStartIndex+1
+       return;
+   }
    if((bNextLineHasSavedTime && bLineHasTimeStamp) || (bLineHasBreak && bNextLineHasSavedTime) )
    {
         strCurrentText.insert(nNextLineStartIndex, '\n');
@@ -1109,23 +1114,24 @@ void MainWindow::on_textEdit_cursorPositionChanged()
         return;
    }
 
-
-   if(bLineHasBreak || bLineHasTimeStamp)
-       placeTextEditCursor(nNextLineStartIndex);
-
-    if(bStringHasSavedTime || strLine.contains(IGNORE_MARKER))
+   if(bStringHasSavedTime || strLine.contains(IGNORE_MARKER))
     {
         if( nIndexOfSavedTimeLine > 0)
         {
             strCurrentText.insert((nStartIndex+nIndexOfSavedTimeLine), '\n');
             ui->textEdit->setText(strCurrentText);
             placeTextEditCursor(nNextLineStartIndex-1);
+            return;
         }
         else
-        placeTextEditCursor(nStartIndex-1);
+        {
+            placeTextEditCursor(nStartIndex-1);
+            return;
+        }
     }
 
-
+    if(bLineHasBreak || bLineHasTimeStamp)
+        placeTextEditCursor(nNextLineStartIndex);
 }
 void MainWindow::placeTextEditCursor(int nPlacement)
 {
@@ -1194,7 +1200,7 @@ bool MainWindow::lineHasTimeStamp(QString strStringToTest,int &nStartIndex ,int 
     nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890][1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"));
     if(nStartIndex >=0)
     {
-        nLength = 12;
+        nLength = 11;
         return true;
     }
     if(nStartIndex < 0)
@@ -1202,7 +1208,7 @@ bool MainWindow::lineHasTimeStamp(QString strStringToTest,int &nStartIndex ,int 
         nStartIndex = strStringToTest.lastIndexOf(QRegExp ("[1234567890]:[1234567890][1234567890]:[1234567890][1234567890] [AP]M"));
         if(nStartIndex >= 0)
         {
-            nLength = 11;
+            nLength = 10;
             return true;
         }
     }
