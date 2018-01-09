@@ -967,6 +967,11 @@ void MainWindow::setAndRemoveTimesForInsertTime(
 
         }
 
+        while (( strCurrentText[nInsertLocation] == '\n'  ) && (nInsertLocation < strCurrentText.length() ))
+        {
+            strCurrentText.remove(nInsertLocation,1);
+        }
+
         if(nLogBeforeAs == TRACK ||nLogBeforeAs == IGNORE)
             strInsertText.append('\n').append(millisecondsToHoursMinsSec(nBeforeTime)).append('\n');
 
@@ -1214,4 +1219,21 @@ bool MainWindow::lineHasTimeStamp(QString strStringToTest,int &nStartIndex ,int 
     }
     return false;
 
+}
+
+void MainWindow::on_actionAlways_On_Top_toggled(bool arg1)
+{
+    {
+        Qt::WindowFlags flags = this->windowFlags();
+        if (arg1)
+        {
+            this->setWindowFlags(flags | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
+            this->show();
+        }
+        else
+        {
+            this->setWindowFlags(flags ^ (Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint));
+            this->show();
+        }
+    }
 }

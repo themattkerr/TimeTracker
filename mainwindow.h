@@ -106,6 +106,8 @@ private slots:
 
     void on_textEdit_textChanged();
 
+    void on_actionAlways_On_Top_toggled(bool arg1);
+
 private:
     Ui::MainWindow *ui;
 
