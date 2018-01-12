@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 4"
+#define TIME_TRACKERR_VERSION "1.1.1 Beta Build 5"
 
 #include <QMainWindow>
 
@@ -41,6 +41,13 @@ enum LoadFileInfo{
     TRACK = 2,
     IGNORE = 3,
     EXIT_NO_SAVE = 4
+};
+enum Direction{
+
+    NOT_MOVING = 0,
+    FORWARD = 1,
+    BACKWARD = 2,
+    FORWARD_AND_BACKWARD = 3
 };
 
 namespace Ui {
@@ -167,6 +174,7 @@ private:
     bool lineHasTimeStamp(QString strStringToTest, int &nStartIndex, int &nLength);
     void placeTextEditCursor(int nPlacement);
     bool stringHasSavedTime(QString strStringToTest, int &nStartIndex);
+    void removeExtraCarriageReturns(int &nStartingLocation, QString &strInputText, unsigned int nDirection);
 };
 
 

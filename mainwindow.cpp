@@ -45,6 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
         m_bExitNow = true;
         hideAllInfo();
     }
+    QString strCurrentText = ui->textEdit->toPlainText();
+    int nCurrentLength = strCurrentText.length();
+    removeExtraCarriageReturns(nCurrentLength,strCurrentText,BACKWARD );
+    ui->textEdit->setText(strCurrentText);
 }
 
 MainWindow::~MainWindow()
@@ -113,8 +117,10 @@ void MainWindow::initializeGUI()
 
     ui->textEdit->append(SECTION_BREAK);
     ui->textEdit->append (t.currentTime().toString("h:mm:ss A" ));
-     //ui->textEdit->append ("\n");
     ui->fontSize_spinBox->setValue(12);
+
+
+
 
 }
 
@@ -124,9 +130,14 @@ void MainWindow::on_pushButton_clicked()
     m_nDeletedTime = 0;
     m_nTotalTrackedTime = m_nTotalTrackedTime + m_nElapsed;
 
-    ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
-    ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A"));
+    QString strCurrentText = ui->textEdit->toPlainText();
+    int nCurrentLength = strCurrentText.length();
+    removeExtraCarriageReturns(nCurrentLength,strCurrentText,BACKWARD );
+    strCurrentText.append(millisecondsToHoursMinsSec(m_nElapsed)).append("\n");
+    strCurrentText.append(SECTION_BREAK).append("\n");
+    strCurrentText.append (t.currentTime().toString("h:mm:ss A")).append("\n");
+
+    ui->textEdit->setText(strCurrentText);
     ui->TotalTrackedTime->setText(millisecondsToHoursMinsSec(m_nTotalTrackedTime)  );
     calculateTotalTime();
     m_nPreviousLogType = TRACK;
@@ -148,11 +159,15 @@ void MainWindow::on_ignoreButton_clicked()
     m_nDeletedTime = 0;
     m_nTotalIgnoredTime = m_nTotalIgnoredTime + m_nElapsed;
 
-    ui->textEdit->append(millisecondsToHoursMinsSec(m_nElapsed));
-    ui->textEdit->append(IGNORE_MARKER);
-    ui->textEdit->append(SECTION_BREAK);
-    ui->textEdit->append (t.currentTime().toString("h:mm:ss A")+"\n");
+    QString strCurrentText = ui->textEdit->toPlainText();
+    int nCurrentLength = strCurrentText.length();
+    removeExtraCarriageReturns(nCurrentLength,strCurrentText,BACKWARD );
+    strCurrentText.append(millisecondsToHoursMinsSec(m_nElapsed)).append("\n");
+    strCurrentText.append(IGNORE_MARKER).append("\n");
+    strCurrentText.append(SECTION_BREAK).append("\n");
+    strCurrentText.append (t.currentTime().toString("h:mm:ss A")).append("\n");
 
+    ui->textEdit->setText(strCurrentText);
     ui->timeIgnored->setText(millisecondsToHoursMinsSec(m_nTotalIgnoredTime)  );
     calculateTotalTime();
     m_nPreviousLogType = IGNORE;
@@ -601,7 +616,7 @@ void MainWindow::removeLastTimeEntry()
     QString strSectionBreak = SECTION_BREAK;
     QString strIgnoreMarker = IGNORE_MARKER;
     QString strSection ="";
-    QString strTempTimeReversed = "";
+
     int nSectionBreakLength = strSectionBreak.length();
     int nCurrentTimeBreak = strCurrentText.lastIndexOf(SECTION_BREAK);
     if(nCurrentTimeBreak < 0)
@@ -614,42 +629,42 @@ void MainWindow::removeLastTimeEntry()
         strSection.append(strCurrentText[eee]);
     }
     QString strLastTimeEntered = readInLastSavedTime(strCurrentText);
-    int nLastTime = strCurrentText.lastIndexOf(QRegExp ("[1234567890][1234567890]s"));
 
-    for (int iii = nLastTime+2; iii >=0; iii-- )
-    {
-        if(strCurrentText[iii] != '\n' && strCurrentText[iii] != ' ')
-            strTempTimeReversed.append(strCurrentText[iii]);
-        else
-            break;
-    }
+    int nStoredAs = 0;
+    int nIndexOfTimeStoredInSection = 0;
+    QString strSavedTime;
 
-    QString strTemp = strTempTimeReversed;
-    for (int jjj = 0, lll = strTempTimeReversed.length()-1;jjj < (strTempTimeReversed.length()); jjj++, lll-- )
-    {
-        strTemp[lll] = strTempTimeReversed[jjj];
-    }
+    int nTimeToSubtract = findAmountTimeSavedInSection(strSection, nStoredAs, nIndexOfTimeStoredInSection, strSavedTime  );
 
-    int nTimeToSubtract = stringToMilliseconds(strTemp);
+    //Must be removed from the bottom in order for indexing to work correctly.
     strCurrentText.remove(strLastTimeEntered);
     strCurrentText.remove(nCurrentTimeBreak,nSectionBreakLength+1);
+    strCurrentText.remove((strCurrentText.lastIndexOf(strSavedTime)),(strSavedTime.length()+1));
 
-    if (strSection.contains(IGNORE_MARKER))
+    if(nStoredAs == IGNORE)
     {
         m_nTotalIgnoredTime -= nTimeToSubtract;
-        strCurrentText.remove((strCurrentText.lastIndexOf(IGNORE_MARKER)),(strIgnoreMarker.length()+1));
+        if(strSection.contains(IGNORE_MARKER))
+            strCurrentText.remove((strCurrentText.lastIndexOf(IGNORE_MARKER)),(strIgnoreMarker.length()+1));
+        if(strSection.contains(LOGGED_AS_IGNORED_MARKER))
+        {
+            QString strTemp = LOGGED_AS_IGNORED_MARKER;
+            strCurrentText.remove(strCurrentText.lastIndexOf(LOGGED_AS_IGNORED_MARKER), strTemp.length()+1);
+        }
     }
     else
         m_nTotalTrackedTime -= nTimeToSubtract;
-
-    strCurrentText.remove((strCurrentText.lastIndexOf(strTemp)),(strTemp.length()+1));
+    if(strSection.contains(MISSING_TIME_MARKER))
+    {
+        QString strTemp = MISSING_TIME_MARKER;
+        strCurrentText.remove( strCurrentText.lastIndexOf(MISSING_TIME_MARKER ), strTemp.length()+1 );
+    }
 
     m_nTotalTime -= nTimeToSubtract;
     m_nDeletedTime += nTimeToSubtract;
 
     ui->textEdit->setText(strCurrentText);
     refreshTimeTotals();
-
 }
 
 void MainWindow::refreshTimeTotals()
@@ -702,12 +717,8 @@ int MainWindow::stringWithTimeEnteredToMilliseconds(QString strStringWithSavedTi
     }
     for (int iii = nLastTime+2; iii >=0; iii-- )
     {
-//        QChar chToTest; chToTest = strStringWithSavedTime[iii];
+
         if(strStringWithSavedTime[iii] != '\n' && strStringWithSavedTime[iii] != ' ')
-//                &&
-//                ( !isALetter( strStringWithSavedTime[iii])
-//                  && (strStringWithSavedTime[iii] == 'h' || strStringWithSavedTime[iii] == 'm' || strStringWithSavedTime[iii] == "s"))
-//                ))
             strTempTimeReversed.append(strStringWithSavedTime[iii]);
         else
             break;
@@ -837,7 +848,7 @@ void MainWindow::on_actionInsert_time_break_triggered()
 
 int MainWindow::findAmountTimeSavedInSection(QString &strSectionText, int &nStoredAs, int &nIndexOfTimeStoredInSection, QString &strSavedTime)
 {
-    if (strSectionText.contains(IGNORE_MARKER))
+    if (strSectionText.contains(IGNORE_MARKER) || strSectionText.contains(LOGGED_AS_IGNORED_MARKER))
         nStoredAs = IGNORE;
     else if (strSectionText.contains(QRegExp ("[1234567890][1234567890]s")))
         nStoredAs = TRACK;
@@ -967,10 +978,11 @@ void MainWindow::setAndRemoveTimesForInsertTime(
 
         }
 
-        while (( strCurrentText[nInsertLocation] == '\n'  ) && (nInsertLocation < strCurrentText.length() ))
-        {
-            strCurrentText.remove(nInsertLocation,1);
-        }
+//        while (( strCurrentText[nInsertLocation] == '\n'  ) && (nInsertLocation < strCurrentText.length() ))
+//        {
+//            strCurrentText.remove(nInsertLocation,1);
+//        }
+        removeExtraCarriageReturns(nInsertLocation, strCurrentText, FORWARD_AND_BACKWARD);
 
         if(nLogBeforeAs == TRACK ||nLogBeforeAs == IGNORE)
             strInsertText.append('\n').append(millisecondsToHoursMinsSec(nBeforeTime)).append('\n');
@@ -1014,20 +1026,17 @@ void MainWindow::setAndRemoveTimesForInsertTime(
         {
             //Do Nothing
         }
-
+        int nTemp = strInsertText.length()+nInsertLocation;
         strCurrentText.insert(nInsertLocation, strInsertText);
+        removeExtraCarriageReturns(nTemp, strCurrentText, FORWARD_AND_BACKWARD);
         ui->textEdit->setText(strCurrentText);
         refreshTimeTotals();
-
-
     }
 
 void MainWindow::on_fontSize_spinBox_valueChanged(int arg1)
 {
     ui->textEdit->setFontPointSize(arg1);
     refreshTextEdit();
-
-
 }
 void MainWindow::refreshTextEdit()
 {
@@ -1037,7 +1046,6 @@ void MainWindow::refreshTextEdit()
     ui->textEdit->setText(strTemp);
 
     ui->textEdit->moveCursor(QTextCursor::End , QTextCursor::MoveAnchor ) ;
-
 }
 
 void MainWindow::on_fontComboBox_activated()
@@ -1104,7 +1112,7 @@ void MainWindow::on_textEdit_cursorPositionChanged()
                 return;
             }
     }
-   if(bLineHasTimeStamp && nLineTimeStampLength < strLine.length() && strLine[nLineTimeStampLength+1] != '\n' ) // <===== Debug this
+   if(bLineHasTimeStamp && nLineTimeStampLength < strLine.length() && strLine[nLineTimeStampLength+1] != '\n' )
    {
        strCurrentText.insert((nStartIndex + nLineTimeStampLength)," \n");
        ui->textEdit->setText(strCurrentText);
@@ -1234,6 +1242,33 @@ void MainWindow::on_actionAlways_On_Top_toggled(bool arg1)
         {
             this->setWindowFlags(flags ^ (Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint));
             this->show();
+        }
+    }
+}
+
+
+void MainWindow::removeExtraCarriageReturns(int &nStartingLocation, QString &strInputText, unsigned int nDirection)
+{
+    if (nDirection != FORWARD && nDirection != BACKWARD && nDirection != FORWARD_AND_BACKWARD)
+    {
+        return;
+    }
+    if(nDirection == FORWARD || nDirection == FORWARD_AND_BACKWARD)
+    {
+        while (( strInputText[nStartingLocation] == '\n'  ) && (nStartingLocation < strInputText.length() && strInputText[nStartingLocation+1] == '\n' ))
+        {
+            strInputText.remove(nStartingLocation,1);
+        }
+    }
+    if(nDirection == BACKWARD || nDirection == FORWARD_AND_BACKWARD)
+    {
+       // while (( strInputText[nStartingLocation] == '\n'  ) && (nStartingLocation > 0 ))
+        if(nStartingLocation > 0)
+        while (( strInputText[nStartingLocation-1] == '\n'  ) && (nStartingLocation > 0 ))
+        {
+            if(strInputText[nStartingLocation-1] == '\n' && strInputText[nStartingLocation] == '\n' )
+                strInputText.remove(nStartingLocation-1,1);
+            nStartingLocation--;
         }
     }
 }

@@ -46,5 +46,5 @@ DISTFILES += \
     install.nsi \
     StopwatchBG.ico
 
-QMAKE_POST_LINK += windeployqt \"$$system_path($${OUT_PWD}/release/TestTime.exe)\" --dir \"$$system_path($${_PRO_FILE_PWD_}/Deploy)\"
-QMAKE_POST_LINK += && $$QMAKE_COPY \"$$system_path($${OUT_PWD}/release/TestTime.exe)\" \"$$system_path($${_PRO_FILE_PWD_}/Deploy/)\"
+#QMAKE_POST_LINK += windeployqt \"$$system_path($${OUT_PWD}/release/TestTime.exe)\" --dir \"$$system_path($${_PRO_FILE_PWD_}/Deploy)\"
+#QMAKE_POST_LINK += && $$QMAKE_COPY \"$$system_path($${OUT_PWD}/release/TestTime.exe)\" \"$$system_path($${_PRO_FILE_PWD_}/Deploy/)\"
